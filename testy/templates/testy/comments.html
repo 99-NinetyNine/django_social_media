@@ -1,0 +1,87 @@
+{% load humanize %}
+<a href="{% url 'total_comments' nature.id %}" name="comments">
+  <p><span class="badge">{{ nature.comments_set.count }} </span> Comment{{ comments|pluralize }}</p><br>
+
+</a>
+<form method="post" class="comment-form" action=".">
+  {% csrf_token %}
+  {{ comment_form.as_p }}
+  {% if request.user.is_authenticated %}
+  <input type="submit" value="Submit" class="btn btn-primary float-right">
+  {% else %}
+  <input type="submit" value="Submit" class="btn btn-primary float-right" disabled>
+  {% endif %}
+</form>
+<br><br>
+
+{% for comment in comments %}
+
+<div class="media">
+  <a class="mr-3" href="{% url 'profile_view' comment.user.username %}">
+    <img src="{{ comment.user.profile.image.url }}" height="64" width="64" class="rounded-circle mr-3" alt="img.">
+    <div class="media-body">
+      <b>
+        <h5 class="mt-0 mb-1">@{{ comment.user.username }} </h5>
+      </b>
+  </a>
+  <p>{{ comment.comment }}
+  <div id="updated-comment-section{{ comment.id }}">
+  {% include 'testy/update.html' %}
+  </div>        
+  </p>
+  <br><br>
+  <p>
+  <form method="post" class="reply-form" action=".">
+    {% csrf_token %}
+    <input type="hidden" name="comment_id" value="{{ comment.id }}">
+    {{ comment_form.as_p }}
+    {% if request.user.is_authenticated %}
+    <input type="submit" value="Reply" class="btn btn-primary float-right reply-btn">
+    {% else %}
+    <input type="submit" value="reply" class="btn btn-primary reply-btn float-right" disabled>
+    {% endif %}
+  </form>
+  </p>
+<br><br>
+
+  {% for reply in comment.replies.all %}
+  <div class="media mt-3">
+    <a class="mr-3" href="{% url 'profile_view' reply.user.username %}">
+      <img src="{{ reply.user.profile.image.url }}" height="64" width="64" class="rounded-circle mr-3" alt="img">
+      <div class="media-body">
+        <b>
+          <h5 class="mt-0 mb-1">@{{ reply.user.username }}</h5>
+        </b>
+    </a>
+    <p>
+      {{ reply.comment }}
+      <div id="updated-comment-section{{ reply.id }}">
+  {% include 'testy/update.html' %}
+  </div>
+  </p>
+  <br><br>
+<p>
+    <form method="post" class="reply-form pull right" action=".">
+      {% csrf_token %}
+      <input type="hidden" name="comment_id" value="{{ comment.id }}">
+      {{ comment_form.as_p }}
+      {% if request.user.is_authenticated %}
+      <input type="submit" value="Reply" class="btn btn-primary float-right">
+      {% else %}
+      <input type="submit" value="reply" class="btn btn-primary float-right" disabled>
+      {% endif %}
+    </form>
+    <br>
+    </p>
+  </div>
+</div>
+
+<hr>
+{% endfor %}
+</div>
+</div>
+
+
+<br>
+
+{% endfor%}

@@ -1,0 +1,10 @@
+{% extends "testy/base.html" %}
+{% block title %}Password reset{% endblock %}
+
+{% block content %}
+<form method="post" action="{% url 'password_reset_complete' %}">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Login" class="btn btn-primary btn-block">
+</form>
+{% endblock content %}

@@ -1,0 +1,12 @@
+{% extends 'testy/base.html' %}
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if request.user.is_authenticated %}
+    <input type="submit" value="Edit" class="btn btn-primary float-right reply-btn">
+    {% else %}
+    <input type="submit" value="Edit" class="btn btn-primary reply-btn float-right" disabled>
+    {% endif %}
+</form>
+{% endblock content %}

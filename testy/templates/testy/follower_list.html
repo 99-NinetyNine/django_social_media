@@ -1,0 +1,59 @@
+{% extends 'testy/base.html' %}
+{% block content %}
+{% with flwr=followers.count flwg=following.count %}
+{% endwith %}
+<p>{{ flwr }} Follower{{ flwr |pluralize }}
+    {{ flwr }}Following{{ flwg |pluralize }}
+</p>
+<p>
+<a class="btn btn-primary" data-toggle="collapse" href="#flwrs" role="button" aria-expanded="false" aria-controls="flwrs">Followers</a>
+<a class="btn btn-primary" data-toggle="collapse" href="#flwg" role="button" aria-expanded="false" aria-controls="flwg">Following</a>
+
+<div class="row">
+  <div class="col">
+    <div class="collapse multi-collapse" id="flwrs">
+      <div class="card card-body">
+       {% for user,is_following in followers.items %}
+          <div class="row">
+        <a href="{% url 'profile_view' user.username %}">
+            <img src={{ user.profile.image.url }} class="rounded-circle" width="45" height="45">
+            <b>@{{ user.username}}</b>
+        </a>
+        
+          {% include "testy/follow.html" %}
+        </div>
+        <br><br>
+        {% if not forloop.last %}<hr>{% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="collapse multi-collapse" id="flwg">
+      <div class="card card-body">
+        
+     {% for user,is_following in following.items %}
+      <div class="row">
+        <a href="{% url 'profile_view' user.username %}">
+            <img src={{ user.profile.image.url }} class="rounded-circle" width="45" height="45">
+            <b>@{{ user.username }}</b>
+        </a>
+        {% include "testy/follow.html" %}
+      
+      </div>
+
+        <br><br>
+        {% if not forloop.last %}<hr>{% endif %}
+
+      {% endfor %}
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock content %}
+

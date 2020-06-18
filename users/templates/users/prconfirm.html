@@ -1,0 +1,13 @@
+{% exdends "testy/base.html" %}
+{% block title %}Password Change{% endblock %}
+
+{% block content %}
+<h2>Password r onfirm</h2>
+
+<form method="post" action="{% url 'password_reset_confirm' %}">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Login" class="btn btn-primary btn-block">
+</form>
+
+{% endblock content %}

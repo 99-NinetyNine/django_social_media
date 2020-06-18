@@ -1,0 +1,22 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Login{% endblock title %}
+
+{% block content %}
+<h2>Login</h2>
+
+{% if messages %}
+{% for message in messages %}
+<p>message</p>
+{% endfor %}
+{% endif %}
+
+<form method="post">
+{% csrf_token %}
+        {{ form.as_p }}
+<input type="submit" value="Login" class="btn btn-primary btn-block">
+</form>
+<p>Don't have an account?<a href={% url 'signup_page' %}>Signup</a></p>
+{# Assumes you setup the password_reset view in your URLconf #}
+<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+{% endblock content %}

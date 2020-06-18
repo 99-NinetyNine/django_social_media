@@ -1,0 +1,15 @@
+{% extends "testy/base.html" %}
+{% block search  %}
+{% if users %}
+{% for user in users %}
+<p>
+    <a href="{% url 'profile_view' user.username %}">@{{ user.username }}</strong>
+        <p>{{ user.first_name }} {{ user.last_name }}</p>
+    </a>
+</p>
+{% endfor%}
+{% else %}
+<p>NOt found</p>
+{% endif %}
+
+{% endblock search %}

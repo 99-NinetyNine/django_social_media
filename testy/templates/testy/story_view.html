@@ -1,0 +1,45 @@
+{% load humanize %}
+{% if messages %}
+<div {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+    {% for message in messages %}
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important:
+    {% endif %}
+
+    {{ message }}
+
+    {% endfor %}
+</div>
+{% endif %}
+{% if msg_post %}
+
+<p style="background-color:orange;">
+<p>Your post has been added
+<p>
+    {{ msg_post.user }} wrote
+    {{ msg_post.tweet_text }}
+
+{% endif %}
+
+<h3>THIS IS STORY</h3>
+<div class="row">
+    {% for s in stories %}
+    <div class="col-sm-3">
+        <a href={{ s.get_absolute_url }}>
+            <div class="well-index-story">
+            {% if s.is_photo %}
+                <img class="img-index-story" src={{ s.photo.url }}>
+            {% elif not s.is_photo %}
+                <video class="img-index-story" src={{ s.photo.url }} autoplay controls>
+            {% endif %}
+            <img class="img-profile-story" src="{{ s.user.profile.image.url }}">
+            {% if s.user.username == request.user.username %}
+                <strong class="name-story-index">My Story</strong>
+            {% else %}
+                <strong class="name-story-index">@{{ s.user.username }}</strong>
+            {% endif %}
+            </div>
+        </a>
+    </div>
+{% endfor %}
+</div>
+<br><br>

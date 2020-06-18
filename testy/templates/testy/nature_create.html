@@ -1,0 +1,23 @@
+{% extends 'testy/base.html'%}
+{% block content %}
+
+<div class="form-group">
+  <form action="{% url 'nature_page' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% for f in formset %}
+    {{ f.as_p }}
+    {% if not formset.can_delete %}
+    {{ f.DELETE }}
+    {% endif %}
+    
+    
+     {% endfor %}
+    
+
+    <div class="well">
+    <input type="submit" value="Tweet" class="btn btn-primary" style="margin:auto;"/>
+  </div>
+  </form>
+</div>
+{% endblock content %}

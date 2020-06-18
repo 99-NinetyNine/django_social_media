@@ -1,0 +1,38 @@
+{% extends 'testy/base.html' %}
+{% block content %}
+{% if messages %}
+<div {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+    {% for message in messages %}
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important:
+    {% endif %}
+
+    {{ message }}
+
+    {% endfor %}
+</div>
+{% endif %}
+
+{% for note in notes %}
+{% if note.is_like %}
+<a href ="{% url 'nature_detail' note.link %}">
+{% elif note.is_comment%}
+<a href ="{% url 'nature_detail' note.link %}">
+{% elif note.is_follow %}
+<a href ="{% url 'followers' request.user.username %}">
+{% endif %}
+<div class="alert alert-info" role="alert">
+<img src={{ note.user.profile.image.url }} height="10" width="10">
+<b>@{{ note.user.username }}</b>
+{{ note }}
+</a>
+</div>
+{% endfor %}
+{% if not notes %}
+<div class="alert alert-info" role="alert">
+  No notification yet.
+</div>
+
+{% endif %}
+
+
+{% endblock content %}

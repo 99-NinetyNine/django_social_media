@@ -1,0 +1,9 @@
+{% extends 'users/account.html' %}
+{% block title %}Sign up {% endblock title %}
+ {% block content%}
+    <form action="{% url 'signup_page' %}" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="submit" class="btn btn-primary btn-block">
+    </form>
+{% endblock content %}

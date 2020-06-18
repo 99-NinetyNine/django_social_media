@@ -1,0 +1,18 @@
+{% extends 'testy/base.html'%}
+{% block content %}
+<div class="form-group">
+  <form action="{% url 'story_page' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% for f in formset %}
+    {{ f.as_p }}
+    {% if formset.can_delete %}
+    {{ f.DELETE }}
+    {% endif %}
+    {% endfor %}
+    <div class="well">
+    <input type="submit" value="Add story" class="btn btn-primary float-right"/>
+  </div>
+  </form>
+</div>
+{% endblock content %}

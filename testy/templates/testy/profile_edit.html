@@ -1,0 +1,9 @@
+{% extends 'testy/base.html' %}
+{% block title %}Edit Profile | {{ block.super }} {% endblock %}
+{% block content %}
+<form action="." method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ user_form.as_p }}
+    <button type="submit" class="btn btn-primary">Change</button>
+</form>
+{% endblock content %}

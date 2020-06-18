@@ -1,0 +1,11 @@
+{% if not  request.user == user %}
+<form action="." method="POST">
+    {% csrf_token %}
+    {% if is_following %}
+    <button type="submit" class="float-right btn btn-danger float-right" id="follow" name="user_id" value="{{ user.id }}">Unfollow</button>
+    {% elif not is_following %}
+    <button type="submit" class="btn btn-primary float-right" id="follow" name="user_id" value="{{ user.id }}">Follow</button>
+    {% endif %}
+</form>
+{% endif %}
+

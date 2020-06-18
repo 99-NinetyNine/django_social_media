@@ -1,0 +1,67 @@
+{% extends 'testy/profile_view.html' %}
+{% block user_posts %}
+{% for nature in natures %}
+<h6>
+    <a href="{% url 'profile_view' nature.user.username %}">
+        <img class="img-index-profile" width="10" height="10" src="{{ nature.user.profile.image.url }}" alt="i">
+        <strong>@{{ nature.user.username }}</strong>
+    </a>
+</h6>
+<a href="{% url 'nature_detail' nature.id %}">
+<div id="{{ nature.id }}" class="carousel slide" data-ride="carousel">
+{% if nature.media.all.count > 1 %}
+  <ol class="carousel-indicators">
+  {% for num in nature.media.all %}
+  {% if forloop.counter0 == 0 %}
+    <li data-target="#{{ nature.id }}" data-slide-to="0" class="active"></li>
+   {% else %}
+    <li data-target="#{{ nature.id }}" data-slide-to="{{ forloop.counter0 }}"></li>
+  {% endif %}
+  {% endfor %}
+  </ol>
+{% endif %}
+<div class="carousel-inner">
+{% for media in nature.media.all %}
+{% if forloop.counter0 == 0 %}
+    <div class="carousel-item active">
+{% else %}
+    <div class="carousel-item">
+{% endif %}
+    {% if media.is_photo %}
+      <img class="d-block w-100"  src="{{ media.photo.url }}" alt="First slide">
+    {% elif not media.is_photo %}
+      <video class="d-block w-100"  src="{{ media.photo.url }}" autoplay controls alt="First slide">
+    {% endif %}
+    
+    <div class="carousel-caption d-none d-md-block">
+        <p>{{ media.about }}</p>
+    </div>
+    </div>
+
+{% endfor %}
+</div>
+{% if  nature.media.all.count > 1 %}
+  <a class="carousel-control-prev" href="#{{ nature.id }}" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#{{ nature.id }}" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+{% endif %}
+
+</div>
+</a>
+{% empty %}
+{% if user == request.user %}
+<h5>You haven't created any post yet.
+<a href="{% url 'nature_page' %}">
+Add now</h5>
+{% else %}
+<h5>No posts yet</h5>
+{% endif %}
+
+{% endfor %}
+<br>
+{% endblock user_posts %}

@@ -1,0 +1,19 @@
+<form action="." method="POST">
+    {% csrf_token %}
+    {% if is_liked %}
+    <button type="submit" class="btn btn-info" id="like" name="tweet_id" value="{{ nature.id }}">Dis Like</button>
+    {% elif is_liked == False %}
+    <button type="submit" class="btn btn-primary" id="like" name="tweet_id" value="{{ nature.id }}">Like</button>
+    {% endif %}
+</form>
+<a href="{% url 'total_likes' nature.id %}">
+
+<p id="all-likes" name="all-likes" value={{ nature.id }}>
+{% if total_likes %}
+{{ total_likes.count }} like{{ total_likes.count|pluralize }}
+{% elif not total_likes %}
+{{ nature.likes.all.count }} like{{ nature.likes.all.count|pluralize }}
+{% endif %}
+</p>
+
+</a>

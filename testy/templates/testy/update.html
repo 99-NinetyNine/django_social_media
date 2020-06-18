@@ -1,0 +1,25 @@
+<div class="btn-group dropleft float-right">
+ 
+    <i class="fa fa-caret-left fa-3x dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-hidden="true"></i>
+  
+  <div class="dropdown-menu">
+  {% if comment.user == request.user or reply.user == request.user %}
+  {% if comment %}
+  <a href="{% url 'comment_update' comment.id %}" type="button" class="dropdown-item">
+  Edit comment
+  {% elif reply %}
+  <a href="{% url 'comment_update' reply.id %}" type="button" class="dropdown-item">
+  Edit reply
+  {% endif %}
+</a>
+
+    
+    <a class="dropdown-item" href="{% url 'comment_delete' comment.id %}">Delete comment</a>
+    {% endif %}
+
+    {% if not comment.user  == request.user or reply.user == request.user %}
+    <a class="dropdown-item" href="#">Report comment</a>
+    {% endif %}
+  </div>
+</div>
+<!-- Button trigger modal -->

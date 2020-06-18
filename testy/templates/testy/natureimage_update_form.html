@@ -1,0 +1,11 @@
+{% extends 'testy/base.html'%}
+{% block content %}
+  {% if error_message %}
+  <p><strong>{{ error_message }}</strong></p>
+  {% endif %}
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Change" class="btn btn-primary btn-block"/>
+  </form>
+{% endblock content %}

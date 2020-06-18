@@ -1,0 +1,116 @@
+{% extends "testy/base.html" %}
+{% load static %}
+{% block content %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-info" role="alert">
+{{ message }}
+</div>
+{% endfor %}
+{% endif %}
+<a href="{% url 'profile_view' user.username %}">
+<img class="rounded-circle" height="80" width="80" src={{ user.profile.image.url }}>
+</a>
+<strong>@{{ user.username }}</strong>
+{% if user == request.user %}
+<p>
+<a href="{% url 'change_profile' %}" role="button" class="btn btn-primary">Change pp</a>
+</p>
+{% endif %}
+
+{% with flwr=followers.count flwg=following.count %}
+{% if followers %}
+<p>
+  <a href="{% url 'followers' user.username %}"> {{ flwr }} Follower{{ flwr |pluralize }} </a>
+  <a href="{% url 'following' user.username %}"> {{ flwg }} Following{{ flwg |pluralize }} </a>
+</p>
+{% endif %}
+{% endwith %} 
+
+{% include 'testy/follow.html' %}
+
+<!-- Header -->
+{% if user.nature.all %}
+{% now "Y" as current_year %}
+{% now "b" as current_month %}
+{% now "W" as current_week %}
+<div class="header" id="myHeader">
+  <h1>Natures as per/</h1>
+  <a href="{% url 'archive_week' user_id=user.id year=current_year week=current_week %}" role="button" class="btn" onclick="three()"><h3>week</h3></a>
+  <a href="{% url 'archive_month' user_id=user.id year=current_year month=current_month %}" role="button" class="btn active" onclick="two()"><h3>month</h3></a>
+  <a href="{% url 'nature_year_archive' user_id=user.id year=current_year %}" role="button" class="btn" onclick="one()"><h3>year</h3></button>
+</div>
+
+{% endif %}
+
+{% block user_posts %}
+
+{% endblock user_posts %}
+
+{% for nature in natures %}
+<h6>
+    <a href="{% url 'profile_view' nature.user.username %}">
+        <img class="img-index-profile" width="10" height="10" src="{{ nature.user.profile.image.url }}" alt="i">
+        <strong>@{{ nature.user.username }}</strong>
+    </a>
+</h6>
+<a href="{% url 'nature_detail' nature.id %}">
+<div id="{{ nature.id }}" class="carousel slide" data-ride="carousel">
+{% if nature.media.all.count > 1 %}
+  <ol class="carousel-indicators">
+  {% for num in nature.media.all %}
+  {% if forloop.counter0 == 0 %}
+    <li data-target="#{{ nature.id }}" data-slide-to="0" class="active"></li>
+   {% else %}
+    <li data-target="#{{ nature.id }}" data-slide-to="{{ forloop.counter0 }}"></li>
+  {% endif %}
+  {% endfor %}
+  </ol>
+{% endif %}
+<div class="carousel-inner">
+{% for media in nature.media.all %}
+{% if forloop.counter0 == 0 %}
+    <div class="carousel-item active">
+{% else %}
+    <div class="carousel-item">
+{% endif %}
+    {% if media.is_photo %}
+      <img class="d-block w-100"  src="{{ media.photo.url }}" alt="First slide">
+    {% elif not media.is_photo %}
+      <video class="d-block w-100"  src="{{ media.photo.url }}" autoplay controls alt="First slide">
+    {% endif %}
+    
+    <div class="carousel-caption d-none d-md-block">
+        <p>{{ media.about }}</p>
+    </div>
+    </div>
+
+{% endfor %}
+</div>
+{% if  nature.media.all.count > 1 %}
+  <a class="carousel-control-prev" href="#{{ nature.id }}" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#{{ nature.id }}" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+{% endif %}
+
+</div>
+</a>
+{% empty %}
+{% if user == request.user %}
+<h5>You haven't created any post yet.
+<a href="{% url 'nature_page' %}">
+Add now</h5>
+{% else %}
+<h5>No posts yet</h5>
+{% endif %}
+
+{% endfor %}
+<br>
+
+
+{% endblock content %}

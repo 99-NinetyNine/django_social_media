@@ -1,0 +1,41 @@
+{% extends 'testy/base.html' %}
+{% load humanize %}
+
+{% block content %}
+{% if request.user == user %}
+{% comment %} a href={% url 'story_detail' pk=story.id %} role="button" class="btn btn-danger">Delete Story</a> {% endcomment %}
+{% endif %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <a href="{% url 'profile_view' user.username %}">@{{ user.username }}{% comment %} user is from context {% endcomment %}
+                <h5><span class="glyphicon glyphicon-time"></span> {{ story.pub_date|naturaltime }} </h5>
+                <div class="col-sm-3 text-center">
+                    <img src="{{ user.profile.image.url }}" class="img-story" height="65" width="65"
+                        alt="Avatar">
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="slideshow-container">
+  {% for s in stories %}
+  <div class="mySlides fade">
+    <div class="numbertext">{{ forloop.counter }} / {{ stories.count }}</div>
+    <img src="{{ s.photo.url }}" style="width:100%">
+  </div>
+    {% endfor %}
+    <br><br>
+  {% comment %}
+  <a class="prev" onclick="plusSlides(-1, 0)">&#10094;</a>
+  <a class="next" onclick="plusSlides(1, 0)">&#10095;</a>
+ {% endcomment %}
+ </div>
+<div style="text-align:center">
+{% for s in stories %}
+  <span class="dot"></span> 
+{% endfor %}
+</div>
+{% endblock content %}
