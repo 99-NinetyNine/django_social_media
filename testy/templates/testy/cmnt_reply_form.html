@@ -1,0 +1,22 @@
+<b>
+     <p class="click-reply" name="reply" id="comment-btn" value={% if reply.id %}"{{ reply.id }}"{% elif comment.id %}"{{ comment.id }}"{% endif %}>Reply</p>
+</b>
+<div class="stylish-form">
+<div style="display:none;" id={% if reply.id %}"toggle-form{{ reply.id }}"{% elif comment.id %}"toggle-form{{ comment.id }}"{% endif %}>
+    <form method="POST" class="reply-form" action=".">
+      {% csrf_token %}
+        <input type="hidden" name="comment_id" value="{{ comment.id }}">
+    <div class="input-group mb-3">        
+    {{ comment_form.comment }}
+    <div class="input-group-append">
+      {% if request.user.is_authenticated %}
+        <button type="submit" value="Reply" class="btn btn-primary float-right reply-btn"><i class="fa fa-paper-plane icon"></i></button>
+      {% else %}
+        <button type="submit" value="reply" class="btn btn-primary reply-btn float-right" disabled><i class="fa fa-user icon"></i></button>
+      {% endif %}
+     
+    </div>
+    </div>
+    </form>
+</div>
+</div>

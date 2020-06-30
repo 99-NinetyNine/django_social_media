@@ -1,8 +1,45 @@
 {% extends 'testy/base.html' %}
 {% block content %}
-{% for s in suggestions %}
-<b>@{{ s.user.username }}</b>
-{{ s.nature }}
+
+{% for nature in suggestions %}
+
+<h6>
+    <a href="{% url 'profile_view' nature.user.username %}">
+        <img class="rounded-circle" width="30" height="30" src="{{ nature.user.profile.image.url }}" alt="i">
+        <strong>@{{ nature.user.username }}</strong>
+    </a>
+</h6>
+<a href="{% url 'nature_detail' nature.id %}">
+{% include 'testy/carousel.html' %}
+</a>
+<br>
 {% endfor %}
 
 {% endblock content %}
+
+{% block right_side %}
+
+{% for user ,is_following in users.items %}
+
+<div class="text-center">
+    <div class="row">
+        <div class="col">
+        <a href="{% url 'profile_view' user.username %}">
+                <img src={{ user.profile.image.url }} class="rounded-circle" width="45" height="45">
+                <br>
+                <b>@{{ user.username}}</b>
+            
+        </a>
+        <br><br>
+          {% include "testy/follow_form.html" %}
+        </div>
+             
+    </div>
+        <br>
+        {% if not forloop.last %}<hr>{% endif %}
+        
+
+
+{% endfor %}
+
+{% endblock right_side %}

@@ -1,0 +1,23 @@
+<div class="btn-group dropleft float-right">
+ 
+    <i class="fa fa-caret-left fa-3x dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-hidden="true"></i>
+  
+  <div class="dropdown-menu">
+  {% if nature.user == request.user %}
+    <a href="{% url 'nature_edit' nature.id %}" type="button" class="dropdown-item">
+        Edit post
+    </a>    
+    <a class="dropdown-item" href="{% url 'nature_delete' nature.id %}">Delete post</a>
+{% comment %} hide show {% endcomment %}
+      {% include 'testy/nature_hide.html' %}
+      {% include 'testy/comment_restrict.html' %}
+    
+    {% endif %}
+
+    {% if not nature.user  == request.user %}
+    <a class="dropdown-item" href="#">Report post</a>
+    {% endif %}
+  </div>
+</div>
+
+{% comment %} for post {% endcomment %}

@@ -1,0 +1,10 @@
+<div id="restrictAllow{{ nature.id }}">
+<form action="." method="POST">
+    {% csrf_token %}
+    {% if nature.restrict_comment == True %}
+    <button type="submit" class="dropdown-item" id="restrict-allow" name="tweet_id" value="{{ nature.id }}">Allow comment</button>
+    {% elif nature.restrict_comment == False %}
+    <button type="submit" class="dropdown-item" id="restrict-allow" name="tweet_id" value="{{ nature.id }}">Restrict comment</button>
+    {% endif %}
+</form>
+</div>

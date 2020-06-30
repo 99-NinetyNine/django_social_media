@@ -1,0 +1,13 @@
+{% block search_right %}
+<div id="search-result">
+    {% for user in users %}
+        <a href="{% url 'profile_view' user.username %}">
+            <img src={{ user.profile.image.url }} class="rounded-circle" width="45" height="45">
+            <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+            <b>@{{ user.username}}</b>
+        </a>
+        {% if not forloop.last %}<hr>{% endif %}
+            
+    {% endfor %}
+</div>
+{% endblock search_right %}

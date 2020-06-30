@@ -1,0 +1,10 @@
+<div id="privatePublic{{ user.id }}">
+<form action="." method="POST">
+    {% csrf_token %}
+    {% if user.profile.private or is_private is True %}
+    <button type="submit" class="btn btn-info" id="private-public" name="tweet_id" value="{{ user.id }}">Public account</button>
+    {% elif user.profile.private or is_private is False %}
+    <button type="submit" class="btn btn-info" id="private-public" name="tweet_id" value="{{ user.id }}">Private account</button>
+    {% endif %}
+</form>
+</div>

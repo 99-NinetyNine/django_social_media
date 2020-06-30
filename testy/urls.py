@@ -2,14 +2,19 @@ from django.urls import path, re_path
 from . import views
 from django.conf.urls.static import static
 from django.conf import settings
+from django.conf.urls import url
+
 
 urlpatterns = [
-    path("", views.Index, name="index_page"),
+    path("", views.IndexView, name="index_page"),
     path("nature/", views.NatureCreate, name="nature_page"),  # nature=Nature
     path("account/settings/", views.AccountSettings, name="account_setting"),
     path("nature/<int:pk>/", views.NatureDetail, name="nature_detail"),
-    path("nature/<int:pk>/update", views.NatureUpdate.as_view(), name="nature_update"),
+    path("nature/hide/", views.HidePost, name="nature_hide"),
+    path("comment/restrict/", views.CommentRestrict, name="comment_restrict"),
+    path("account/visibility/", views.ProfileVisibility, name="private_public"),
     path("post/<int:pk>/delete", views.NatureDelete.as_view(), name="nature_delete"),
+    url(r"(?P<id>\d+)/nature/edit$", views.NatureEdit, name="nature_edit"),
     # for ajax
     # path("total_likes/", views.TotalLikes, name="total_likes"),
     path("nature/likes/", views.LikePost, name="like_post"),
@@ -20,8 +25,8 @@ urlpatterns = [
     path("change/photo/", views.ChangeProfile, name="change_profile"),
     path("profile/edit/", views.EditProfile, name="edit_profile"),
     re_path(r"^(?P<username>\w+)/profile$", views.ProfileView, name="profile_view"),
-    re_path(r"^(?P<username>\w+)/followers$", views.FollwerList, name="followers"),
-    re_path(r"^(?P<username>\w+)/following$", views.FollwerList, name="following"),
+    re_path(r"^(?P<username>\w+)/followers$", views.FollowerList, name="followers"),
+    re_path(r"^(?P<username>\w+)/following$", views.FollowerList, name="following"),
     path("search/", views.SearchUser, name="search_user"),
     path("notifications/", views.Notify, name="notify_page"),
     path("live/", views.LiveStream, name="live_page"),
@@ -57,4 +62,7 @@ urlpatterns = [
     path(
         "comment/<int:pk>/delete", views.CommentDelete.as_view(), name="comment_delete"
     ),
+    path("my/favourites/", views.FavouritePostList, name="fav_list"),
+    path("favourites/edit/", views.FavouritePost, name="fav_edit"),
+    path("test/123/", views.TestView, name="test_on"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

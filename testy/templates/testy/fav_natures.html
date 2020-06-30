@@ -10,25 +10,27 @@
     {% endfor %}
 </div>
 {% endif %}
-{% comment %} 
-{% include 'testy/story_view.html' %}
- {% endcomment %}
-{% for nature,tuple in natures_context.items %}
+
+{% for nature in favourite_posts %}
 <h6>
     <a href="{% url 'profile_view' nature.user.username %}">
         <img class="rounded-circle" width="30" height="30" src="{{ nature.user.profile.image.url }}" alt="i">
         <strong>@{{ nature.user.username }}</strong>
     </a>
-    {% include 'testy/update_menu.html' %}
 </h6>
 <a href="{% url 'nature_detail' nature.id %}">
-{% include 'testy/carousel.html' %}
+{% include "testy/carousel.html" %}
 </a>
-{% include 'testy/like_comment.html' %}
+<br>
 
+<div id="fav-section{{ nature.id }}">
+{% include 'testy/fav_section.html' %}
+</div>
+
+<br><hr>
+{% empty %}
+<h3>You haven't added any post to favourite lists.<h3>
 {% endfor %}
 
-{% if not natures_context %}
-<h3>Follow People to view thier posts.</h3>
-{% endif %}
+
 {% endblock content %}

@@ -16,6 +16,10 @@
   <link rel="stylesheet" type="text/css" href="{% static 'testy/css/story_view.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'testy/css/index.css' %}">
   {% endcomment %}
+  <style>
+  {% block otherCSS %}
+  {% endblock otherCSS %}
+  </style>
 </head>
 
 <body>
@@ -43,12 +47,7 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="https://www.facebook.com/messages/t/gita.bogati.79">Messages</a>
-        </li>
-        <li class="nav-item">
-        {% if request.user.is_authenticated %}
-          <a class="nav-link" href="{% url 'logout' %}">logout</a>
-        {% endif %}
+          <a class="nav-link" href="{% url 'fav_list' %}">Favourites</a>
         </li>
 
         <li class="nav-item dropdown">
@@ -56,18 +55,18 @@
             aria-expanded="false">Settings</a>
           <div class="dropdown-menu" aria-labelledby="dropdown01">
             <a class="dropdown-item" href="{% url 'account_setting' %}">Account Settings</a>
-            <a class="dropdown-item" href="{% url 'signup_page' %}">Sign up</a>
-            <a class="dropdown-item" href="#">Something else here</a>
+            
+            <a class="dropdown-item" href="{% url 'logout' %}">Switch Account</a>
+            <a class="dropdown-item" href="{% url 'logout' %}">Logout <b>@{{ request.user.username}}</b></a>
           </div>
         </li>
       </ul>
-      <form class="input-group mb-3" style="margin:auto;max-width:300px;" method="GET" action="{% url 'search_user' %}">
-        >
-        <input class="form-control" type="search" aria-label="Search" placeholder="Search Testy" name="q"
-          value={{ request.GET.q }}>
+      <form class="input-group mb-3" style="max-width:300px;" method="GET" action="{% url 'search_user' %}"> 
+             <input class="form-control" type="text" id="search" aria-label="Search" placeholder="Search Testy" name="q">
         <div class="input-group-append">
-          <button class="btn btn-success" type="submit">Go</button>
+          <button class="btn btn-success" id="search-user" type="submit">Go</button>
         </div>
+        
       </form>
     </div>
   </nav>
@@ -97,8 +96,10 @@
         {% endblock content %}
       </div>
       <div class="col-sm-2 float-right">
-        {% block search %}
-        {% endblock search %}
+        {% block search_right %}
+        {% endblock search_right %}
+        {% block right_side %}
+        {% endblock right_side %}
         <h3>adss</h3>
       </div>
     </div>
@@ -120,21 +121,20 @@
         return confirm("Are you sure to delete this post?");
       });
 
-      $('.reply-btn').click(function () {
-        $(this).parent().parent().next('.replied-comments').fadeToggle()
-      });
+  $(".click-reply").click(function(){
+    var pk = $(this).attr('value');
+    var xyz="toggle-form"+pk;
+    $("#"+xyz).toggle();
+  });
 
 
-      $(function () {
-        setTimeout(function () {
-          $('.alert').slideUp(2000);
-        }, 5000);
-      });
 
       $(document).on('click', '#like', function (event) {
         event.preventDefault();
+
+
         var pk = $(this).attr('value');
-        var likeSection="like-section"+pk
+        var likeSection="like-section"+pk;
         $.ajax({
           type: 'POST',
           url: '{% url "like_post" %}',
@@ -149,6 +149,7 @@
           },
         });
       });
+
       {% comment %} 
 
     $(document).on('click', '#all-likes', function (event) {
@@ -160,10 +161,10 @@
           data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
           dataType: 'json',
           success: function (response) {
-            $('#total-likes').html(response['form'])
-            console.log($('#total-likes').html(response['form']));
+            $('#total-likes').html(response['form']);
+            
           },
-          error: function (rs, e) {
+          error: function (rs, e) { 
             console.log(rs.responseText);
           },
         }); 
@@ -180,8 +181,8 @@
           data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
           dataType: 'json',
           success: function (response) {
-            $('#'+followSection).html(response['form'])
-            console.log($('#'+followSection).html(response['form']));
+            $('.'+followSection).html(response['form']);
+            
           },
           error: function (rs, e) {
             console.log(rs.responseText);
@@ -189,9 +190,28 @@
         });
       });
 
+      $(document).on('click', '#follow-form', function (event) {
+        event.preventDefault();
+        var pk = $(this).attr('value');
+        var followSection="follow-section"+pk
+        $.ajax({
+          type: 'POST',
+          url: '{% url "follow_user" %}',
+          data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}','just_form':pk,},
+          dataType: 'json',
+          success: function (response) {
+            $('.'+followSection).html(response['form']);
+            
+          },
+          error: function (rs, e) {
+            console.log(rs.responseText);
+          },
+        });
+      });
+
+
       $(document).on('submit', '.comment-form', function (event) {
         event.preventDefault();
-        console.log($(this).serialize());
         $.ajax({
           type: 'POST',
           url: $(this).attr('action'),
@@ -199,15 +219,9 @@
           dataType: 'json',
           success: function (response) {
             $('.main-comment-section').html(response['form']);
-            $('textarea').val('');
-            $('.reply-btn').click(function () {
-              $(this).parent().parent().next('.replied-comments').fadeToggle();
-              $('textarea').val('');
-            });
-          },
-          error: function (rs, e) {
-            console.log(rs.responseText);
-          },
+            $('#id_comment').val('');
+            },
+          
         });
       });
 
@@ -222,11 +236,46 @@
           dataType: 'json',
           success: function (response) {
             $('.main-comment-section').html(response['form']);
-            $('textarea').val('');
-            $('.reply-btn').click(function () {
-              $(this).parent().parent().next('.replied-comments').fadeToggle();
-              $('textarea').val('');
-            });
+            $('id_comment').val('');
+            
+          },
+          
+        });
+      });
+
+    $(document).on('click', '#search-user', function (event) {
+        event.preventDefault();
+        var x = $(this).attr('value');
+        var query=$(this).prev().attr('value');
+        console.log(query);
+        console.log(x);
+
+        $.ajax({
+          type: 'GET',
+          url: '{% url "search_user" %}',
+          data: {'q': query,},
+          dataType: 'json',
+          success: function (response) {
+            $('#search-result').html(response['form']);
+            console.log($('#search-result').html(response['form']));
+            
+          },
+        });
+      });
+        
+    
+      $(document).on('click', '#favourite', function (event) {
+        event.preventDefault();
+        var pk = $(this).attr('value');
+        var favSection="fav-section"+pk
+        $.ajax({
+          type: 'POST',
+          url: '{% url "fav_edit" %}',
+          data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+          dataType: 'json',
+          success: function (response) {
+            $('#'+favSection).html(response['form'])
+            console.log($('#'+favSection).html(response['form']));
           },
           error: function (rs, e) {
             console.log(rs.responseText);
@@ -234,15 +283,74 @@
         });
       });
 
-
-
-      $('#notify-span').click(function () {
-        $(this).hide();
+    
+      $(document).on('click', '#hide-show', function (event) {
+        event.preventDefault();
+        var pk = $(this).attr('value');
+        var hideShow="hideShow"+pk
+        $.ajax({
+          type: 'POST',
+          url: '{% url "nature_hide" %}',
+          data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+          dataType: 'json',
+          success: function (response) {
+            $('#'+hideShow).html(response['form'])
+            console.log($('#'+hideShow).html(response['form']));
+          },
+          error: function (rs, e) {
+            console.log(rs.responseText);
+          },
+        });
+      });
+      
+      $(document).on('click', '#restrict-allow', function (event) {
+        event.preventDefault();
+        var pk = $(this).attr('value');
+        var restrictAllow="restrictAllow"+pk
+        $.ajax({  
+          type: 'POST',
+          url: '{% url "comment_restrict" %}',
+          data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}','restrict':pk, },
+          dataType: 'json',
+          success: function (response) {
+            $('#'+restrictAllow).html(response['form'])
+            console.log($('#'+restrictAllow).html(response['form']));
+          },
+          error: function (rs, e) {
+            console.log(rs.responseText);
+          },
+        });
       });
 
-  
+    
+      $(document).on('click', '#private-public', function (event) {
+        event.preventDefault();
+        var pk = $(this).attr('value');
+        var privatePublic="privatePublic"+pk
+        $.ajax({
+          type: 'POST',
+          url: '{% url "private_public" %}',
+          data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}', },
+          dataType: 'json',
+          success: function (response) {
+            $('#'+privatePublic).html(response['form'])
+            console.log($('#'+privatePublic).html(response['form']));
+          },
+          error: function (rs, e) {
+            console.log(rs.responseText);
+          },
+        });
+      });
+
+    {% block otherJs %}
+
+    {% endblock otherJs %}
+
 
     });
+    {% block plainJS %}
+
+    {% endblock plainJS %}
 
 
   </script>

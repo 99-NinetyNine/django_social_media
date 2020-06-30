@@ -1,10 +1,11 @@
 import os
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "zvh7d&)9ga$)*_t2j1f6b1s2#vjyc9jh7(&-3fp8oz72ry57=0"
+SECRET_KEY = "zvh7d&)9ga$)*_t2j11s2#vjyc9jh7(&-3fp8oz72ry57=0"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -17,8 +18,6 @@ LOGIN_URL = "login"
 # Application definition
 
 INSTALLED_APPS = [
-    "channels",
-    "chat",
     "testy",
     "users",
     "allauth",
@@ -80,7 +79,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "pyshop.wsgi.application"
 
-ASGI_APPLICATION = "pyshop.routing.application"
+# ASGI_APPLICATION = "pyshop.routing.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -137,3 +136,4 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+django_heroku.settings(locals())

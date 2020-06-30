@@ -1,42 +1,42 @@
-{% extends 'testy/base.html'%}
+{% extends 'testy/base.html' %}
 {% block content %}
-
-<div class="form-group">
-  <form action="{% url 'nature_page' %}" method="POST" enctype="multipart/form-data">
+<h3>My Services</h3>
+<form action="{% url 'test_on' %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ formset.management_form }}
+  
+{{ formset.management_form }}
+
 <div id="form_set">
     {% for form in formset.forms %}
     <div class="parent">
-        <div class="form" id="{{ form.prefix }}">
-            {{ form.as_p }}
-        
-            
+        <div class="form" id="{{ form.prefix }}" style="padding:15px;border-style:solid;border-color:colar;" onfoucs=abc()>
+            {{ form.as_p }}           
+            {{ form.non_field_errors }}
+        {{ form.errors }}
         </div>
-    </div>
+      </div>
     {% endfor %}
 </div>
-<input type="button" value="Add More" class="btn btn-info add-form" id="addBtn">
-
-<br><br>
-<div class="text-center">
-    <input type="submit" value="Tweet" class="btn btn-primary" style="float:none;">
-</div>
-  
-  </form>
-<div id="empty_form" style="display:none">
-<div class="parent">
+</form>
+<input type="button" value="Add More" class="add-form" id="addBtn" >
+<div id="empty_form" style="padding:15px;border-style:solid;border-color:colar;display:none;">
+  <div class="parent">
   <div class="form" id="{{ formset.empty_form.prefix }}">
         {{ formset.empty_form.as_p }}
         <button class="btn btn-danger delete-form" style="float:right;" id="btn-{{ formset.empty_form.prefix }}" value="{{ formset.empty_form.prefix }}">Remove</button>
     </div>
+  </div>
 </div>
+<div class="text-center">
+    <input type="submit" value="Test123" class="btn btn-primary">
 </div>
-</div>
-
+  
 {% endblock content %}
-{% block otherJs %}
-   $(document).on('click', '.add-form', function (event) {
+ 
+    {% block otherJs %}
+
+
+      $(document).on('click', '.add-form', function (event) {
         event.preventDefault();
         var form_idx = $('#id_form-TOTAL_FORMS').val();
         $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
@@ -45,8 +45,6 @@
       });
  
    
-     
-      
       
       $(document).on('click', '.delete-form', function (event) {
         event.preventDefault();
@@ -64,7 +62,9 @@
           $(this).html($(this).html().replace(regOld,newId)); 
             
   		  
-            console.log($(this).html());
+        
+
+        console.log($(this).html());
         
     
         });
@@ -75,6 +75,11 @@
        $('#id_form-TOTAL_FORMS').val(parseInt(form_id) - 1);
 
       });
+  
    
+
+
+
+
 
     {% endblock otherJs %}

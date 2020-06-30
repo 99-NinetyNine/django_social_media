@@ -14,6 +14,9 @@ class Nature(models.Model):
     location = models.CharField(max_length=19, blank=True)
     likes = models.ManyToManyField(User, related_name="likes", blank=True)
     # is_photo = models.BooleanField(default=False, blank=True)
+    hide_post = models.BooleanField(default=False, blank=True)
+    restrict_comment = models.BooleanField(default=False, blank=True)
+    favourite = models.ManyToManyField(User, related_name="favourite", blank=True)
 
     class Meta:
         ordering = ["-pub_date"]
@@ -50,8 +53,10 @@ class NatureImage(models.Model):
         super().save()
 
         image = Image.open(self.photo.path)
-        if image.height > 600 or image.width > 600:
-            output_size = (500, 500)
+        # change filename
+
+        if image.height > 1200 or image.width > 1200:
+            output_size = (1000, 1000)
             image.thumbnail(output_size)
             image.save(self.photo.path)
             print("image resized from model")
@@ -72,6 +77,9 @@ class Comments(models.Model):
 
     class Meta:
         ordering = ["timestamp"]
+
+    def was_recent(self):
+        return self.timestamp >= timezone.now() - datetime.timedelta(seconds=30)
 
     def __str__(self):
         return self.comment
@@ -170,3 +178,15 @@ class Live(models.model):
     def __str__(self):
         return f"{self.user.username} live video"
 """
+
+
+class Test(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="live")
+    photo = models.ImageField(upload_to="images/", blank=True)
+    pub_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-pub_date"]
+
+    def __str__(self):
+        return f"{self.user.username} test photo/video"

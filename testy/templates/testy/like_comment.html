@@ -1,0 +1,14 @@
+<div class="d-flex flex-row justify-content-around">
+  <div class="p-2" id="like-section{{ nature.id }}">
+    {% include 'testy/like_section.html' %}
+  </div>
+  
+  <div class="p-2">
+    <a href="{% url 'nature_detail' nature.id %}">
+      <button class="btn btn-info"><span class="fa fa-comment"></span></button>
+    </a>
+  </div>
+  <div class="p-2" id="fav-section{{ nature.id }}">
+    {% include 'testy/fav_section.html' %}
+  </div>
+</div>

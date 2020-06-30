@@ -1,0 +1,18 @@
+<div class="stylish-form">
+<form method="post" class="comment-form" action=".">
+  {% csrf_token %}
+<div class="input-group mb-3">
+    
+    {{ comment_form.comment }}
+    
+    <div class="input-group-append">
+        {% if request.user.is_authenticated %}
+        <button type="submit" id="comment-btn" value="Submit" class="btn btn-primary float-right"><i class="fa fa-paper-plane icon"></i></button>
+        {% else %}
+         <button type="submit" id="comment-btn" value="Submit" class="btn btn-primary float-right" disabled><i class="fa fa-user icon"></i></button>
+        {% endif %}
+    </div>
+</div>
+</form>
+<br><br>
+</div>

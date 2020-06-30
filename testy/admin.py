@@ -6,6 +6,7 @@ from .models import (
     Comments,
     Notification,
     Contact,
+    Test,
 )
 
 from users.models import Profile
@@ -24,7 +25,6 @@ class CommentAdmin(admin.TabularInline):
 class NatureAdmin(admin.ModelAdmin):
     inlines = [
         NatureImageAdmin,
-        CommentAdmin,
     ]
 
 
@@ -34,3 +34,5 @@ admin.site.register(Comments)
 admin.site.register(Contact)
 admin.site.register(Profile)
 admin.site.register(Notification)
+
+admin.site.register(Test)

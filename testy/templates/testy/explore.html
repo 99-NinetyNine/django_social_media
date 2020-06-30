@@ -1,0 +1,17 @@
+{% extends 'testy/base.html' %}
+{% block content %}
+{% for nature in explores %}
+
+<h6>
+    <a href="{% url 'profile_view' nature.user.username %}">
+        <img class="rounded-circle" width="30" height="30" src="{{ nature.user.profile.image.url }}" alt="i">
+        <strong>@{{ nature.user.username }}</strong>
+    </a>
+</h6>
+<a href="{% url 'nature_detail' nature.id %}">
+{% include 'testy/carousel.html' %}
+</a>
+<br>
+{% endfor %}
+
+{% endblock content %}
