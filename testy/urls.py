@@ -8,11 +8,9 @@ from django.conf.urls import url
 urlpatterns = [
     path("", views.IndexView, name="index_page"),
     path("nature/", views.NatureCreate, name="nature_page"),  # nature=Nature
-    path("account/settings/", views.AccountSettings, name="account_setting"),
     path("nature/<int:pk>/", views.NatureDetail, name="nature_detail"),
     path("nature/hide/", views.HidePost, name="nature_hide"),
     path("comment/restrict/", views.CommentRestrict, name="comment_restrict"),
-    path("account/visibility/", views.ProfileVisibility, name="private_public"),
     path("post/<int:pk>/delete", views.NatureDelete.as_view(), name="nature_delete"),
     url(r"(?P<id>\d+)/nature/edit$", views.NatureEdit, name="nature_edit"),
     # for ajax
@@ -22,9 +20,8 @@ urlpatterns = [
     # it works for cmnt also.
     path("total_comments/<int:pk>/", views.TotalComments, name="total_comments"),
     path("nature/follow/", views.FollowUnfollow, name="follow_user"),
-    path("change/photo/", views.ChangeProfile, name="change_profile"),
-    path("profile/edit/", views.EditProfile, name="edit_profile"),
-    re_path(r"^(?P<username>\w+)/profile$", views.ProfileView, name="profile_view"),
+    path("nature/follower/request", views.AcceptFollower, name="accept_follower"),
+    path("<str:username>/profile/", views.ProfileView, name="profile_view"),
     re_path(r"^(?P<username>\w+)/followers$", views.FollowerList, name="followers"),
     re_path(r"^(?P<username>\w+)/following$", views.FollowerList, name="following"),
     path("search/", views.SearchUser, name="search_user"),

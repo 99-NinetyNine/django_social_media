@@ -1,8 +1,0 @@
-{% extends 'testy/base.html' %}
-{% block content %}
-<form action="{% url 'change_profile' %}" method="POST" enctype="multipart/form-data">
-{% csrf_token %}
-{{ pp_change.as_p }}
-<button type="submit" class="btn btn-primary">Change</button>
-</form>
-{% endblock content %}

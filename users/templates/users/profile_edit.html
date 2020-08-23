@@ -1,0 +1,10 @@
+{% extends 'users/account_setting.html' %}
+{% block title %}Edit Profile/ {{ request.user.username|capfirst }}{{ block.super }} {% endblock %}
+{% block center_content %}
+<form action="." method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ pp_change.as_p }}
+    {{ user_form.as_p }}
+    <button type="submit" class="btn btn-primary">Change</button>
+</form>
+{% endblock center_content %}

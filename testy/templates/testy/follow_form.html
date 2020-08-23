@@ -1,13 +1,23 @@
 <div class="follow-section{{ user.id }}">
 
-{% if not  request.user == user %}
+{% if  not request.user == user %}
+
 <form action="." method="POST">
     {% csrf_token %}
+    
     {% if is_following %}
-    <button type="submit" class="float-right btn btn-danger" id="follow-form" name="user_id" value="{{ user.id }}">Unfollow</button>
+    <button type="submit" class="btn btn-danger" id="follow-form" name="user_id" value="{{ user.id }}">Unfollow</button>
     {% elif is_following == False %}
-    <button type="submit" class="btn btn-primary" id="follow-form" name="user_id" value="{{ user.id }}">Follow</button>
+        {% if is_follow_req_pending %}
+            <button type="submit" class="btn btn-info" id="follow-form" value="{{ user.id }}"  name="user_id">Requested</button>
+        {% else %}
+        <button type="submit" class="btn btn-primary" id="follow-form" name="user_id" value="{{ user.id }}">Follow</button>
+        {% endif %}
+    
     {% endif %}
 </form>
+    
+
 {% endif %}
+
 </div>

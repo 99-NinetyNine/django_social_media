@@ -2,9 +2,14 @@
 {% block content %}
 <div class="follower-list">
 
+<div class="d-flex justify-content-around">
 
-<a class="btn btn-primary" data-toggle="collapse" href="#flwrs" role="button" aria-expanded="false" aria-controls="flwrs">Followers</a>
-<a class="btn btn-primary" data-toggle="collapse" href="#flwg" role="button" aria-expanded="false" aria-controls="flwg">Following</a>
+  <div class="p-2 bd-highlight"><a class="btn btn-primary" data-toggle="collapse" href="#flwrs" aria-expanded="false" aria-controls="flwrs"  role="button">Followers</a></div>
+  <div class="p-2 bd-highlight"><a class="btn btn-primary" data-toggle="collapse" href="#flwg" aria-expanded="false" aria-controls="flwg" role="button" >Following</a></div>
+  
+</div>
+
+
 
 <div class="row">
   <div class="col">
@@ -12,15 +17,20 @@
       <div class="card card-body">
        {% for user,is_following in followers_list.items %}
           <div class="row">
-        <a href="{% url 'profile_view' user.username %}">
-            <img src={{ user.profile.image.url }} class="rounded-circle" width="45" height="45">
-            <b>@{{ user.username}}</b>
-        </a>
-        
-          {% include "testy/follow_form.html" %}
+              <div class="col">
+              <a href="{% url 'profile_view' user.username %}">
+                  <img src={{ user.profile.image.url }} class="rounded-circle" width="45" height="45">
+                  <b>@{{ user.username}}</b>
+              </a>
+              </div>
+              <div class="col float-right">
+                {% include "testy/follow_form.html" %}
+              </div>
         </div>
         <br><br>
         {% if not forloop.last %}<hr>{% endif %}
+        {% empty %}
+        <b>No followers</b>
         {% endfor %}
       </div>
     </div>
@@ -32,17 +42,21 @@
         
      {% for user,is_following in following_list.items %}
       <div class="row">
-        <a href="{% url 'profile_view' user.username %}">
-            <img src={{ user.profile.image.url }} class="rounded-circle" width="45" height="45">
-            <b>@{{ user.username }}</b>
-        </a>
-        {% include "testy/follow_form.html" %}
-      
+        <div class="col">
+          <a href="{% url 'profile_view' user.username %}">
+              <img src={{ user.profile.image.url }} class="rounded-circle" width="45" height="45">
+              <b>@{{ user.username }}</b>
+          </a>
+        </div>
+        <div class="col float-right">
+          {% include "testy/follow_form.html" %}
+        </div>
       </div>
 
         <br><br>
         {% if not forloop.last %}<hr>{% endif %}
-
+      {% empty %}
+        <b>No following</b>
       {% endfor %}
 
 

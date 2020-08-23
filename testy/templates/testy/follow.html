@@ -1,18 +1,26 @@
-<div class="follow-section{{ user.id }}">
+<div class="follow-section{{ user.id }}"">
 {% comment %} for profile view nthg more. {% endcomment %}
 {% if not  request.user == user %}
+
 <form action="." method="POST">
     {% csrf_token %}
     {% if is_following %}
     <button type="submit" class="float-right btn btn-danger float-right" id="follow" name="user_id" value="{{ user.id }}">Unfollow</button>
     {% elif is_following == False %}
-    <button type="submit" class="btn btn-primary float-right" id="follow" name="user_id" value="{{ user.id }}">Follow</button>
+      {% if is_follow_req_pending %}
+         <button type="submit" class="btn btn-info float-right" id="follow" name="user_id" value="{{ user.id }}">Requested</button>
+      {% else %}
+      <button type="submit" class="btn btn-primary float-right" id="follow" name="user_id" value="{{ user.id }}">Follow</button>
+      {% endif %}
     {% endif %}
+    {% comment %} {% include "testy/ajax_loading.html" %} {% endcomment %}
+
+
 </form>
 {% endif %}
 
 <p>
-  <a href="{% url 'followers' user.username %}"> {{ followers }}Follower{{ followers |pluralize }} </a>
-  <a href="{% url 'following' user.username %}"> {{ following }}Following{{ following |pluralize }} </a>
+  <a href="{% url 'followers' user.username %}"> {{ followers }} Follower{{ followers |pluralize }} </a>
+  <a href="{% url 'following' user.username %}"> {{ following }} Following{{ following |pluralize }} </a>
 </p>
 </div>

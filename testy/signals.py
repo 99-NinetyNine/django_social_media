@@ -77,8 +77,9 @@ def follow_alert(sender, instance, action, pk_set, **kwargs):
             u = User.objects.get(id=x)
         print("instance==>", instance)
         user = instance
+
         if action == "post_add":
-            msg = u.username + " started following " + instance.username
+            msg = u.username + " started following you"
 
             if not u == instance:
                 Notification.objects.create(
@@ -89,6 +90,28 @@ def follow_alert(sender, instance, action, pk_set, **kwargs):
         elif action == "post_remove":
             user.notes.filter(user=instance, user_by=u, is_follow=True).delete()
             print(u.username, "unfollowed " + instance.username)
+
+
+# @receiver(m2m_changed, sender=Contact)
+def follow_alert_private(sender, instance, action, pk_set, **kwargs):
+    if instance:
+        msg = ""
+        u = []
+        for x in pk_set:
+            u = User.objects.get(id=x)
+        print("instance==>", instance)
+        user = instance
+        if user.profile.private is False:
+            return
+        if action == "pre_add":
+            msg = u.username + " requested to follow " + instance.username
+
+            if not u == instance:
+                Notification.objects.create(
+                    user=instance, user_by=u, content=msg, is_follow_request=True
+                )
+
+            print("Signal has done its job")
 
 
 # afule garda no

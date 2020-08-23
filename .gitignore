@@ -4,6 +4,3 @@ env
 .vscode
 icons
 chat
-media
-static
-staticfiles

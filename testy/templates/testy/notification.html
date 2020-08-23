@@ -1,5 +1,12 @@
 {% extends 'testy/base.html' %}
+{% block title %}
+
+Notifications/{{ request.user.username|capfirst }}
+
+{% endblock title %}
+
 {% block content %}
+
 {% if messages %}
 <div {% if message.tags %} class="{{ message.tags }}" {% endif %}>
     {% for message in messages %}
@@ -20,11 +27,24 @@
 {% elif note.is_follow %}
 <a href ="{% url 'followers' request.user.username %}">
 {% endif %}
-<div class="alert alert-info" role="alert">
+<div class="alert alert-info note" role="alert">
+<div class="row">
+<div class="col">
 <img src={{ note.user.profile.image.url }} height="10" width="10">
-<b>@{{ note.user.username }}</b>
+
 {{ note }}
+
+</div>
+<div class="col float-right">
+{% if note.is_follow_request %}
+{% include 'testy/accept_decline.html' %}
+{% endif %}
+{% if not note.is_follow_request %}
 </a>
+{% endif %}
+</div>
+
+</div>
 </div>
 {% endfor %}
 {% if not notes %}

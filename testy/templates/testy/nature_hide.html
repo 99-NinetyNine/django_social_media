@@ -1,10 +1,10 @@
-<div id="hideShow{{ nature.id }}">
+<div id="hide-show{{ nature.id }}">
 <form action="." method="POST">
     {% csrf_token %}
-    {% if nature.hide_post == False %}
-    <button type="submit" class="dropdown-item" id="hide-show" name="tweet_id" value="{{ nature.id }}">Hide post</button>
-    {% elif nature.hide_post == True %}
-    <button type="submit" class="dropdown-item" id="hide-show" name="tweet_id" value="{{ nature.id }}">Show post</button>
+    {% if nature.hide_post == False or is_hidden is False %}
+    <button type="submit" class="dropdown-item" id="hide" name="tweet_id" value="{{ nature.id }}">Hide post</button>
+    {% elif nature.hide_post or is_hidden %}
+    <button type="submit" class="dropdown-item" id="hide" name="tweet_id" value="{{ nature.id }}">Show post</button>
     {% endif %}
 </form>
 </div>

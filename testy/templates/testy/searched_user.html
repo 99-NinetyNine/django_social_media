@@ -1,13 +1,44 @@
-{% block search_right %}
+{% extends 'testy/base.html' %}
+{% block title %}
+Search
+{% endblock %}
+{% block intro_index %}
+Search results
+{% endblock %}
+{% block right_side %}
 <div id="search-result">
     {% for user in users %}
         <a href="{% url 'profile_view' user.username %}">
-            <img src={{ user.profile.image.url }} class="rounded-circle" width="45" height="45">
-            <strong>{{ user.first_name }} {{ user.last_name }}</strong>
-            <b>@{{ user.username}}</b>
+            <img src={{ user.profile.image.url }} class="rounded-circle" width="30" height="30">
+            <strong style="margin:0 0 0 0.5rem;">{{ user.first_name }} {{ user.last_name }}</strong><br>
+            <b style="margin:0 0 0 2rem;">@{{ user.username}}</b><br>
         </a>
         {% if not forloop.last %}<hr>{% endif %}
             
     {% endfor %}
 </div>
-{% endblock search_right %}
+{% endblock right_side %}
+    
+{% block otherJs %}
+ {% comment %} 
+ $(document).on('click', '#search-user', function (event) {
+        event.preventDefault();
+        var x = $(this).attr('value');
+        var query=$(this).prev().attr('value');
+        console.log(query);
+        console.log(x);
+
+        $.ajax({
+          type: 'GET',
+          url: '{% url "search_user" %}',
+          data: {'q': query,},
+          dataType: 'json',
+          success: function (response) {
+            $('#search-result').html(response['form']);
+            console.log($('#search-result').html(response['form']));
+            
+          },
+        });
+      }); 
+      {% endcomment %}
+{% endblock otherJs %}

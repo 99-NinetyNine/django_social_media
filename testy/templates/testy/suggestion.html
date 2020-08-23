@@ -1,45 +1,38 @@
 {% extends 'testy/base.html' %}
+{% block title %}
+Suggestion/Testy
+{% endblock title %}
+{% block otherCSS %}
+
+.card{
+   min-height: 250px;
+     
+}
+.card-img-top{
+  min-height:30px;
+  max-height:130px;
+}
+{% endblock otherCSS %}
+
+{% block intro_index %}{% if idea %}{{ idea }}{% else %}Suggestions{% endif %}{% endblock %}
 {% block content %}
 
-{% for nature in suggestions %}
-
-<h6>
-    <a href="{% url 'profile_view' nature.user.username %}">
-        <img class="rounded-circle" width="30" height="30" src="{{ nature.user.profile.image.url }}" alt="i">
-        <strong>@{{ nature.user.username }}</strong>
-    </a>
-</h6>
-<a href="{% url 'nature_detail' nature.id %}">
-{% include 'testy/carousel.html' %}
-</a>
-<br>
-{% endfor %}
-
-{% endblock content %}
-
-{% block right_side %}
-
-{% for user ,is_following in users.items %}
-
-<div class="text-center">
-    <div class="row">
-        <div class="col">
-        <a href="{% url 'profile_view' user.username %}">
-                <img src={{ user.profile.image.url }} class="rounded-circle" width="45" height="45">
-                <br>
-                <b>@{{ user.username}}</b>
-            
-        </a>
-        <br><br>
+  <div class="row">
+    {% for user,is_following in users.items %}
+    <div class="col">
+      <div class="card text-center" style="width: 13rem;">
+        <img src={{ user.profile.image.url }} class="card-img-top" alt="{{ user.username }}">
+        <div class="card-body">
+          <h5 class="card-title">{{ user.first_name }} {{ user.last_name }}</h5>
+          <h6>@{{ user.username }}</h6>
+          <p class="card-text">{{ user.bio }}</p>
           {% include "testy/follow_form.html" %}
         </div>
-             
+      </div>
     </div>
-        <br>
-        {% if not forloop.last %}<hr>{% endif %}
-        
-
 
 {% endfor %}
+</div>
 
-{% endblock right_side %}
+
+{% endblock content %}

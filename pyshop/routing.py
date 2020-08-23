@@ -1,13 +1,21 @@
-"""
-from channels.auth import AuthMiddlewareStack
+from django.urls import path
+
+from channels.http import AsgiHandler
 from channels.routing import ProtocolTypeRouter, URLRouter
-from chat import routing
+from channels.auth import AuthMiddlewareStack
+
+from chat.consumers import ChatConsumer
 
 application = ProtocolTypeRouter(
     {
-        # (http->django views is added by default)
-        "websocket": AuthMiddlewareStack(URLRouter(routing.websocket_urlpatterns)),
+        "websocket": AuthMiddlewareStack(
+            URLRouter(
+                [
+                    # URLRouter just takes standard Django path() or url() entries.
+                    path("chat/stream/", ChatConsumer),
+                ]
+            ),
+        ),
     }
 )
 
-"""

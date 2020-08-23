@@ -1,0 +1,15 @@
+{% comment %} for notificatio :accept or decline {% endcomment %}
+<div id="accept-decline{{ note.id }}">
+
+<form class="accept-form" action="." method="POST" >
+    {% csrf_token %}
+    <input type="hidden" name="user_id" value="{{ note.user_by.id }}">
+    
+    <button type="submit" class="btn btn-primary ml-1" name="accept" value="{{ note.id }}">Accept</button>        
+    
+    <button type="submit" class="btn btn-danger ml-1" name="decline" value="{{ note.id }}">Decline</button>        
+    
+        
+</form>
+
+</div>

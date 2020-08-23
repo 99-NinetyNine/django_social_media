@@ -1,0 +1,26 @@
+.well-index-story {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+/* Centered text */
+.name-story-index {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+}
+.img-index-story {
+  border-radius: 50px;
+  height: 160px;
+  width: 130px;
+}
+
+.img-profile-story {
+  position: absolute;
+  top: 9px;
+  left: 19px;
+  height: 30px;
+  width: 30px;
+  border-radius: 15px;
+}

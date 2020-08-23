@@ -46,11 +46,11 @@ class NatureImage(models.Model):
     photo = models.FileField(upload_to="images/", blank=True, null=True)
     is_photo = models.BooleanField(default=False, blank=True)
 
-    def save(self):
+    def save(self, *args, **kwargs):
+
+        super().save(*args, **kwargs)
         if not self.photo:
             return
-
-        super().save()
 
         image = Image.open(self.photo.path)
         # change filename
@@ -105,6 +105,12 @@ class Contact(models.Model):
     def was_recent(self):
         return self.created >= timezone.now() - datetime.timedelta(days=1)
 
+    """ 
+    def clean(self):
+        if self.user_to.profile.is_private:
+            return
+    """
+
 
 User.add_to_class(
     "following",
@@ -125,6 +131,7 @@ class Notification(models.Model):
     is_like = models.BooleanField(blank=True, default=False)
     is_comment = models.BooleanField(blank=True, default=False)
     is_follow = models.BooleanField(blank=True, default=False)
+    is_follow_request = models.BooleanField(blank=True, default=False)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:

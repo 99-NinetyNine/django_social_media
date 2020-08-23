@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
+{% block signup_css %}
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -133,10 +134,11 @@ input[type=submit]:hover {
     text-align: center;
   }
 }
+{% endblock signup_css %}
 </style>
 </head>
 <body>
-
+{% block signup_content %}
 <div class="container">
     <div class="row">
       <h2 style="text-align:center">Login with Social Media or Manually</h2>
@@ -180,6 +182,6 @@ input[type=submit]:hover {
     </div>
   </div>
 </div>
-
+{% endblock signup_content %}
 </body>
 </html>

@@ -1,19 +1,162 @@
 from django.contrib.auth.models import User
-from django.contrib.auth import update_session_auth_hash
-from django.shortcuts import redirect, render
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from django.http import JsonResponse, HttpResponse
-from .forms import SignupForm
-from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect, render, get_object_or_404, Http404
+from django.urls import reverse, reverse_lazy
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import ValidationError
+from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import LogoutView
+from django.forms import modelformset_factory
+from django.views.generic.dates import (
+    YearArchiveView,
+    MonthArchiveView,
+    WeekArchiveView,
+)
 from django.views import View
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.views import View
 
-# from .tokens import account_activation_token
-from django.core.mail import EmailMessage
+
+from django.views.generic import (
+    View,
+    CreateView,
+    UpdateView,
+    DetailView,
+    DeleteView,
+)
+from django.contrib.auth.views import LogoutView
+from django.views.generic.list import MultipleObjectMixin
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
+from django.contrib import messages
+import datetime
+import random
+
+from .forms import (
+    SignupForm,
+    UserEditForm,
+    ProfilePictureEditForm,
+)
+
+from testy.models import Contact
+from .models import Profile
+
+
+@login_required
+def EditProfile(request):
+    if request.method == "POST":
+        user_form = UserEditForm(data=request.POST or None, instance=request.user)
+        pp_change = ProfilePictureEditForm(
+            data=request.POST or None,
+            instance=request.user.profile,
+            files=request.FILES,
+        )
+        if user_form.is_valid() and pp_change.is_valid():
+            form1 = user_form.save(commit=False)
+            form2 = pp_change.save(commit=False)
+            form1.user, form2.user = request.user
+            form1.save()
+            form2.save()
+
+            messages.success(request, "Your profile has been updated successfully.")
+            return HttpResponseRedirect(
+                reverse("profile_view", args=[request.user.username])
+            )
+
+    else:
+        user_form = UserEditForm(instance=request.user)
+        pp_change = ProfilePictureEditForm(instance=request.user.profile)
+
+    is_private = False
+    if request.user.profile.private:
+        is_private = True
+    context = {
+        "is_private": is_private,
+        "user_form": user_form,
+        "pp_change": pp_change,
+    }
+    return render(request, "users/profile_edit.html", context)
+    # return HttpResponseRedirect(request.user.profile.get_absolute_url())
+
+
+@login_required
+def ChangeProfilePhoto(request):
+    if request.method == "POST":
+        pp_change = ProfilePictureEditForm(
+            data=request.POST or None,
+            instance=request.user.profile,
+            files=request.FILES,
+        )
+        if pp_change.is_valid():
+            f = pp_change.save(commit=False)
+            f.user = request.user
+            f.save()
+            return HttpResponseRedirect(
+                reverse("profile_view", args=[request.user.username])
+            )
+
+    else:
+        pp_change = ProfilePictureEditForm(instance=request.user.profile)
+
+    context = {
+        "pp_change": pp_change,
+    }
+    print(pp_change)
+    return render(request, "users/pp_change.html", context)
+
+
+@login_required
+def ProfileVisibility(request):
+    user = get_object_or_404(User, id=request.POST.get("id"))
+    if not user == request.user:
+        raise Http404()
+    is_private = False
+    if user.profile.private:
+        is_private = False
+    elif not user.profile.private:
+        is_private = True
+
+    Profile.objects.filter(user=user).update(private=is_private)
+    context = {
+        "is_private": is_private,
+    }
+    if request.is_ajax():
+        html = render_to_string("users/private_account.html", context, request=request)
+        return JsonResponse({"form": html})
+
+
+@login_required
+def PrivacySetting(request):
+    is_private = False
+    if request.user.profile.private:
+        is_private = True
+    context = {
+        "is_private": is_private,
+    }
+    return render(request, "users/privacy_setting.html", context)
+    # return HttpResponseRedirect(request.ser.profile.get_absolute_url())
+
+
+def signupview(request):
+    if request.user.is_authenticated:
+        # return reverse("profile_view", args=["request.user.username"])
+        return HttpResponseRedirect("/")
+    if request.method == "POST":
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            x = form.save(commit=False)
+            x.save()
+            return redirect("index_page")
+
+    else:
+        form = SignupForm()
+    return render(request, "users/signup.html", {"form": form})
+
+
+class MyLogoutView(LogoutView):
+    template_name = "users/home.html"
+    extra_context = {"form": AuthenticationForm()}
+
 
 """
 
@@ -76,21 +219,3 @@ class Activate(View):
             return HttpResponse("Password changed successfully")
 
  """
-
-
-def signupview(request):
-    if request.method == "POST":
-        form = SignupForm(request.POST)
-        if form.is_valid():
-            x = form.save(commit=False)
-            x.save()
-            return redirect("login")
-
-    else:
-        form = SignupForm()
-    return render(request, "users/signup.html", {"form": form})
-
-
-class MyLogoutView(LogoutView):
-    template_name = "users/home.html"
-    extra_context = {"form": AuthenticationForm()}

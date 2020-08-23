@@ -23,7 +23,7 @@ carousel {% endcomment %}
 {% include 'testy/like_comment.html' %} {% comment %} like cmnt fav {% endcomment %}
 {% if nature.restrict_comment == False %}
 
-<div class="main-comment-section">
+<div class="comment-section">
     {% include 'testy/comments.html' %}
 </div>
 
@@ -44,7 +44,7 @@ carousel {% endcomment %}
 {% endblock otherCSS %}
 {% block plainJS %}
 
-var input = document.getElementById("id_comment");
+{% comment %} var input = document.getElementById("id_comment");
 
 input.addEventListener("keyup", function(event) {
   
@@ -54,5 +54,5 @@ input.addEventListener("keyup", function(event) {
     
     document.getElementById("comment-btn").click();
   }
-});
+}); {% endcomment %}
 {% endblock plainJS %}

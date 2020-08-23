@@ -1,0 +1,12 @@
+{% extends "users/account_setting.html" %}
+{% block title %}Password Change/{{ request.user.username|capfirst }}{% endblock %}
+
+{% block center_content %}
+<h2>Password r confirm</h2>
+
+<form method="post" action="{% url 'password_reset_done' %}">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Login" class="btn btn-primary btn-block">
+</form>
+{% endblock center_content %}

@@ -57,29 +57,6 @@ class CommentForm(forms.ModelForm):
         # self.fields["comment"].widget.attrs["columns"] = 15
 
 
-class UserEditForm(forms.ModelForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={"readonly": "readonly"}))
-    email = forms.CharField(widget=forms.TextInput(attrs={"readonly": "readonly"}))
-
-    class Meta:
-        model = User
-        fields = [
-            "first_name",
-            "last_name",
-            "username",
-            "email",
-        ]
-
-
-class ProfilePictureEditForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        exclude = [
-            "user",
-            "last_seen",
-        ]
-
-
 class CommentEditForm(forms.ModelForm):
     class Meta:
         model = Comments

@@ -41,10 +41,24 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_UNIQUE_EMAIL = True
 SITE_ID = 1
+""" 
+ACCOUNT_FORMS (={
+    'login': '',    
+    "change_password": "django.contrib.auth.forms.ChangePasswordForm",
+    "disconnect":"allauth.socialaccount.forms.DisconnectForm",
+    "reset_password":"django.contrib.auth.forms.ResetPasswordForm",
+    "set_password":"django.contrib.auth.forms.SetPasswordForm",
+    "signup":"django.contrib.auth.forms.SignupForm",
+    "signup":"allauth.socialaccount.forms.SignupForm",
+    "reset_password_from_key":"django.contrib.auth.forms.ResetPasswordKeyForm",
 
+})
+
+"""
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
+    "users.authenticate.EmailAuthbackend",
 ]
 
 
@@ -81,6 +95,14 @@ WSGI_APPLICATION = "pyshop.wsgi.application"
 
 # ASGI_APPLICATION = "pyshop.routing.application"
 
+""" CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [("127.0.0.1", 6379)],},
+    },
+}
+"""
+
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -104,7 +126,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
-
+# project
+""" CHAT_WS_SERVER_HOST = "localhost"
+CHAT_WS_SERVER_PORT = 5002
+CHAT_WS_SERVER_PROTOCOL = "ws"
+DATETIME_FORMAT = "d.m.Y H:i:s"
+ """
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -118,14 +145,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-""" 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [("*", 6379)],},
-    },
-}
-"""
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")

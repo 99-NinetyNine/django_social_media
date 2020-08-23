@@ -1,6 +1,18 @@
-<b>
+<div class="d-flex flex-row justify-content-start">
+  <div class="p-2" id="reply-form{{ reply.id }}">
+    <b>
      <p class="click-reply" name="reply" id="comment-btn" value={% if reply.id %}"{{ reply.id }}"{% elif comment.id %}"{{ comment.id }}"{% endif %}>Reply</p>
-</b>
+    </b>
+  </div>
+  
+  {% if not reply %}
+  <div class="p-2" id="replies{{ comment.id }}">
+    <b><p class="toggle-reply" value="{{ comment.id }}">{{ comment.replies.count }} Repl{% if comment.replies.count == 1 %}y{% else %}ies{% endif %}</p></b>
+  </div>
+  {% endif %}
+  
+</div>
+
 <div class="stylish-form">
 <div style="display:none;" id={% if reply.id %}"toggle-form{{ reply.id }}"{% elif comment.id %}"toggle-form{{ comment.id }}"{% endif %}>
     <form method="POST" class="reply-form" action=".">

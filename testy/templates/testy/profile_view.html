@@ -1,5 +1,8 @@
 {% extends "testy/base.html" %}
 {% load static %}
+{% block title %}
+{{ request.user.username|capfirst }}/Profile
+{% endblock title %}
 {% block content %}
 {% if messages %}
 {% for message in messages %}
@@ -16,15 +19,15 @@
 <p>
 <a href="{% url 'change_profile' %}" role="button" class="btn btn-primary">Change pp</a>
 </p>
-{% include 'testy/private_account.html' %}
+
 {% endif %}
-
+{% if not is_archive %}
 {% include 'testy/follow.html' %} 
-
+{% endif %}
 <!-- Header -->
-{% if is_private is False %}{% comment %} no posts for pvt ac. {% endcomment %}
+{% comment %} no posts for pvt ac.logic from view {% endcomment %}
 
-{% if user.nature.all %}
+{% if natures %}
 {% now "Y" as current_year %}
 {% now "b" as current_month %}
 {% now "W" as current_week %}
@@ -38,8 +41,8 @@
 {% endif %}
 
 {% for nature in natures %}
-{% if nature.hide_post == True %}
-{% if nature.user == request.user %}
+{% if nature.hide_post == True and user == request.user %}
+
 <h6>
     <a href="{% url 'profile_view' nature.user.username %}">
         <img class="img-index-profile" width="10" height="10" src="{{ nature.user.profile.image.url }}" alt="i">
@@ -51,7 +54,7 @@
 {% include 'testy/carousel.html' %}
 
 </a>
-{% endif %}
+
 {% elif nature.hide_post == False %}
 <h6>
     <a href="{% url 'profile_view' nature.user.username %}">
@@ -65,19 +68,20 @@
 
 </a>
 {% endif %}
+
 {% empty %}
-{% if user == request.user %}
-<h5>You haven't created any post yet.
-<a href="{% url 'nature_page' %}">
-Add now</h5>
-{% else %}
-<h5>No posts yet</h5>
-{% endif %}
+    {% if user == request.user %}
+        <h5>You haven't created any post yet.
+        <a href="{% url 'nature_page' %}">
+        Add now</h5>
+    {% else %}
+        <h5>No posts yet</h5>
+    {% endif %}
 
 {% endfor %}
 <br>
-{% endif %}
-{% if is_private is True %}
+
+{% if is_private and not user == request.user %}
 <h5>This account is private.<br>Follow <b>@{{ user.username }}</b> to see posts</h5>
 {% endif %}
 

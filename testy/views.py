@@ -35,8 +35,6 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from .forms import (
     CommentForm,
-    UserEditForm,
-    ProfilePictureEditForm,
     NatureEditForm,
     StoryForm,
     CommentEditForm,
@@ -87,24 +85,18 @@ class BaseImageFormset(BaseModelFormSet):
 
 
 def TestView(request):
-    ImageFormset = modelformset_factory(
-        NatureImage, fields=("about", "photo",), formset=BaseArticleFormSet
-    )
-
-    if request.method == "POST":
-        formset = ImageFormset(request.POST or None, request.FILES)
-        if formset.is_valid():
-            print("my validator")
-        else:
-            form_errors = formset.errors
-        return render(
-            "testy/test.html", {"formset": formset, "form_errors": form_errors}
-        )
-    else:
-        formset = ImageFormset(queryset=Nature.objects.none())
+    x={}
+    users=User.objects.all()
+    for u in users: 
+        is_active=False
+        if u.is_active:
+            is_active=True
+        x[u]=is_active
+        
+        
 
     context = {
-        "formset": formset,
+        "users": x,
     }
     return render(request, "testy/test.html", context)
 
@@ -136,7 +128,7 @@ class AjaxableResponseMixin:
             return response
 
 
-class NatureWeekArchiveView(LoginRequiredMixin, WeekArchiveView):
+class NatureWeekArchiveView(LoginRequiredMixin, UserPassesTestMixin, WeekArchiveView):
     def get_queryset(self):
         self.user = get_object_or_404(User, id=self.kwargs["user_id"])
         return Nature.objects.filter(user=self.user)
@@ -147,8 +139,30 @@ class NatureWeekArchiveView(LoginRequiredMixin, WeekArchiveView):
     week_format = "%W"
     allow_future = True
 
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context["user"] = self.user
+        context["is_archive"] = True
+        return context
 
-class NatureMonthArchiveView(LoginRequiredMixin, MonthArchiveView):
+    def test_func(self):
+        self.user = get_object_or_404(User, id=self.kwargs["user_id"])
+        if not self.user == self.request.user:
+            if self.user.profile.private:
+                if not self.user.followers.filter(id=self.request.user.id).exists():
+                    return False
+                else:
+                    return True
+            else:
+                return True
+
+        elif self.user == self.request.user:
+            return True
+
+
+class NatureMonthArchiveView(LoginRequiredMixin, UserPassesTestMixin, MonthArchiveView):
     def get_queryset(self):
         self.user = get_object_or_404(User, id=self.kwargs["user_id"])
         return Nature.objects.filter(user=self.user)
@@ -158,8 +172,30 @@ class NatureMonthArchiveView(LoginRequiredMixin, MonthArchiveView):
     date_field = "pub_date"
     allow_future = True
 
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context["user"] = self.user
+        context["is_archive"] = True
+        return context
 
-class NatureYearArchiveView(LoginRequiredMixin, YearArchiveView):
+    def test_func(self):
+        self.user = get_object_or_404(User, id=self.kwargs["user_id"])
+        if not self.user == self.request.user:
+            if self.user.profile.private:
+                if not self.user.followers.filter(id=self.request.user.id).exists():
+                    return False
+                else:
+                    return True
+            else:
+                return True
+
+        elif self.user == self.request.user:
+            return True
+
+
+class NatureYearArchiveView(LoginRequiredMixin, UserPassesTestMixin, YearArchiveView):
     def get_queryset(self):
         self.user = get_object_or_404(User, id=self.kwargs["user_id"])
         return Nature.objects.filter(user=self.user)
@@ -170,13 +206,41 @@ class NatureYearArchiveView(LoginRequiredMixin, YearArchiveView):
     make_object_list = True
     allow_future = True
 
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context["user"] = self.user
+        context["is_archive"] = True
+        return context
+
+    def test_func(self):
+        self.user = get_object_or_404(User, id=self.kwargs["user_id"])
+        if not self.user == self.request.user:
+            if self.user.profile.private:
+                if not self.user.followers.filter(id=self.request.user.id).exists():
+                    return False
+                else:
+                    return True
+            else:
+                return True
+
+        elif self.user == self.request.user:
+            return True
+
 
 @login_required
 def IndexView(request):
-    print("bug me")
+    print("bug me index view")
     users = request.user.following.all()
     if not users:
-        return render(request, "testy/index.html")
+        idea="Follow People to view thier post."
+        users=SuggestionAlgorithm(request)
+        context={
+            "idea":idea,
+            "users":users,
+        }
+        return render(request, "testy/suggestion.html",context)
 
     post_per_user = []
     post_context = []
@@ -376,6 +440,11 @@ def FavouritePostList(request):
 def FavouritePost(request):
     nature = get_object_or_404(Nature, id=request.POST.get("id"))
     is_fav = False
+    if not nature.user == request.user:
+        if not nature.user.followers.filter(id=request.user.id).exists():
+            if nature.user.profile.private or nature.hide_post:
+                raise Http404()
+
     if nature.favourite.filter(id=request.user.id).exists():
         nature.favourite.remove(request.user)
     else:
@@ -397,24 +466,28 @@ class NatureDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         post = self.get_object()
-        if self.request.user == post.user:
-            return True
-
-        return False
+        return self.request.user == post.user
 
 
 @login_required
 def NatureDetail(request, pk):
     nature = get_object_or_404(Nature, id=pk)
-    nature_comments = Comments.objects.filter(nature=nature, reply=None)
+
+    if not nature.user == request.user:
+        if not nature.user.followers.filter(id=request.user.id).exists():
+            if nature.user.profile.private or nature.hide_post:
+                raise Http404("Sorry ,no posts found")
+
+    comments_context = Comments.objects.filter(nature=nature, reply=None)
     first_cmnt = None
-    first_cmnt = Comments.objects.filter(nature=nature, reply=None).first()
-    comments_context = []
-    if first_cmnt.was_recent():
-        comments_context = [
-            first_cmnt,
-        ]
-    comments_context += nature_comments
+    # first_cmnt = Comments.objects.filter(nature=nature, reply=None).first()
+    # comments_context = []
+    # if first_cmnt:
+    #    if first_cmnt.was_recent():
+    #        comments_context = [
+    #            first_cmnt,
+    #        ]
+
     is_liked = False
     is_favourite = False
     if nature.likes.filter(id=request.user.id).exists():
@@ -437,25 +510,70 @@ def NatureDetail(request, pk):
                 nature=nature, user=request.user, comment=content, reply=comment_qs
             )
 
-            return reverse("nature_detail", args=[nature.id,])
+            # return reverse("nature_detail", args=[nature.id,])
 
     else:
         comment_form = CommentForm()
-
-    context = {
-        "nature": nature,
-        "is_liked": is_liked,
-        "is_favourite": is_favourite,
-        "total_likes": nature.total_likes(),
-        "comments": comments_context,
-        "comment_form": comment_form,
-    }
+    if request.is_ajax():
+        context = {
+            "comments": Comments.objects.filter(nature=nature, reply=None),
+        }
+    else:
+        context = {
+            "nature": nature,
+            "is_liked": is_liked,
+            "is_favourite": is_favourite,
+            "total_likes": nature.total_likes(),
+            "comments": comments_context,
+            "comment_form": comment_form,
+        }
 
     if request.is_ajax():
         html = render_to_string("testy/nature_detail.html", context, request=request)
         return JsonResponse({"form": html})
 
     return render(request, "testy/nature_detail.html", context)
+
+
+@login_required
+def ProfileView(request, username):
+    if not username:
+        username = request.user.username
+
+    user = User.objects.get(username=username)
+    visitor = request.user
+    is_following = False
+    is_private = False
+    is_follow_req_pending = False
+    natures = None
+    if not user == visitor:
+        if user.followers.filter(id=visitor.id).exists():
+            is_following = True
+
+        if is_following is False and user.profile.private:
+            if Notification.objects.filter(
+                user=user, user_by=visitor, is_follow_request=True
+            ).exists():
+                is_follow_req_pending = True
+            natures = None
+            is_private = True
+
+        elif is_following is True:
+            natures = Nature.objects.filter(user=user)
+
+    else:
+        natures = Nature.objects.filter(user=user)
+
+    context = {
+        "is_following": is_following,
+        "user": user,
+        "natures": natures,
+        "followers": user.followers.all().count(),
+        "following": user.following.all().count(),
+        "is_private": is_private,
+        "is_follow_req_pending": is_follow_req_pending,
+    }
+    return render(request, "testy/profile_view.html", context)
 
 
 @login_required
@@ -508,6 +626,8 @@ def HidePost(request):
     # update works only with filter so.
     nature_id = request.POST.get("id")
     Nature.objects.filter(id=nature_id).update(hide_post=hide_post)
+    nature = get_object_or_404(Nature, id=request.POST.get("id"))
+    print(nature.hide_post)
     context = {
         "nature": nature,
         "is_hidden": hide_post,
@@ -530,6 +650,7 @@ def CommentRestrict(request):
     # update works only with filter so.
     nature_id = request.POST.get("id")
     Nature.objects.filter(id=nature_id).update(restrict_comment=is_restrict)
+    nature = get_object_or_404(Nature, id=request.POST.get("id"))
     context = {
         "nature": nature,
     }
@@ -570,6 +691,12 @@ class CommentDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 def LikePost(request):
     nature = get_object_or_404(Nature, id=request.POST.get("id"))
     is_liked = False
+
+    if not nature.user == request.user:
+        if not nature.user.followers.filter(id=request.user.id).exists():
+            if nature.user.profile.private or nature.hide_post:
+                raise Http404("Sorry,no page found")
+
     if nature.likes.filter(id=request.user.id).exists():
         nature.likes.remove(request.user)
         is_liked = False
@@ -646,100 +773,6 @@ def TotalComments(request, pk):
 
 
 @login_required
-def EditProfile(request):
-    if request.method == "POST":
-        user_form = UserEditForm(data=request.POST or None, instance=request.user)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            return HttpResponseRedirect(
-                reverse("profile_view", args=[request.user.username])
-            )
-
-    else:
-        user_form = UserEditForm(instance=request.user)
-
-    context = {
-        "user_form": user_form,
-    }
-    messages.success(request, "Your profile picture  has been updated successfully.")
-    # return render(request, "testy/profile_edit.html", context)
-    # return HttpResponseRedirect(request.user.profile.get_absolute_url())
-
-
-def ProfileVisibility(request):
-    user = get_object_or_404(User, id=request.POST.get("id"))
-    if not user == request.user:
-        raise Http404()
-    is_private = False
-    if user.profile.private:
-        is_private = False
-    elif not user.profile.private:
-        is_private = True
-
-    Profile.objects.filter(user=user).update(private=is_private)
-    context = {
-        "is_private": is_private,
-    }
-    if request.is_ajax():
-        html = render_to_string("testy/private_account.html", context, request=request)
-        return JsonResponse({"form": html})
-
-
-@login_required
-def ChangeProfile(request):
-    if request.method == "POST":
-        pp_change = ProfilePictureEditForm(
-            data=request.POST or None,
-            instance=request.user.profile,
-            files=request.FILES,
-        )
-        if pp_change.is_valid():
-            f = pp_change.save(commit=False)
-            f.user = request.user
-            f.save()
-            return HttpResponseRedirect(
-                reverse("profile_view", args=[request.user.username])
-            )
-
-    else:
-        pp_change = ProfilePictureEditForm(instance=request.user.profile)
-
-    context = {
-        "pp_change": pp_change,
-    }
-
-    return render(request, "testy/pp_change.html", context)
-
-
-@login_required
-def ProfileView(request, username):
-    if not username:
-        username = request.user.username
-
-    user = User.objects.get(username=username)
-    visitor = request.user
-    is_following = False
-    is_private = False
-    if Contact.objects.filter(user_from=visitor, user_to=user).exists():
-        is_following = True
-    if is_following is False and user.profile.private:
-        natures = None
-        is_private = True
-    else:
-        natures = Nature.objects.filter(user=user)
-
-    context = {
-        "is_following": is_following,
-        "user": user,
-        "natures": natures,
-        "followers": user.followers.all().count(),
-        "following": user.following.all().count(),
-        "is_private": is_private,
-    }
-    return render(request, "testy/profile_view.html", context)
-
-
-@login_required
 def FollowerList(request, username):
     user = User.objects.get(username=username)
     visitor = request.user
@@ -772,32 +805,106 @@ def FollowUnfollow(request):
     visitor = request.user
     user = get_object_or_404(User, id=request.POST.get("id"))
     is_following = False
+    is_follow_req_pending = False
     pk = request.POST.get("id")
     if Contact.objects.filter(user_from=visitor, user_to=user).exists():
         user.followers.remove(visitor)
         is_following = False
 
     else:
-        user.followers.add(visitor)
-        is_following = True
+        if user.profile.private is False:
+            user.followers.add(visitor)
+            is_following = True
+            is_follow_req_pending = False
 
-    context = {
-        "user": user,
-        "is_following": is_following,
-        "followers": user.followers.all().count(),
-        "following": user.following.all().count(),
-    }
+        elif user.profile.private is True:
+            note = Notification.objects.filter(
+                user=user, user_by=visitor, is_follow_request=True
+            )
+            # note = get_object_or_404(Notification, id=request.POST.get("note"))
+            if note.exists():
+                for x in note:
+                    user_note = x.user
+                    user_by_note = x.user_by
+
+                if visitor == user_by_note:  # for change (request to follow)  only
+                    note.delete()
+                    is_follow_req_pending = False
+                    is_following = False
+            else:
+                msg = visitor.username + " requested to follow " + "you."
+                Notification.objects.create(
+                    user=user, user_by=visitor, content=msg, is_follow_request=True
+                )
+                is_follow_req_pending = True
+                is_following = False
+
     just_form = request.POST.get("just_form")
     if just_form == pk:
         context = {
             "user": user,
             "is_following": is_following,
+            "is_follow_req_pending": is_follow_req_pending,
         }
+    else:
+        context = {
+            "user": user,
+            "is_following": is_following,
+            "is_follow_req_pending": is_follow_req_pending,
+            "followers": user.followers.all().count(),
+            "following": user.following.all().count(),
+        }
+
     if request.is_ajax():
         if just_form == pk:
             html = render_to_string("testy/follow_form.html", context, request=request)
+
         else:
+
             html = render_to_string("testy/follow.html", context, request=request)
+        return JsonResponse({"form": html})
+
+
+@login_required
+def AcceptFollower(request):
+    user = request.user
+    visitor = get_object_or_404(User, id=request.POST.get("user_id"))
+    print(request.POST.get("user_id"), user, visitor)
+
+    note = get_object_or_404(
+        Notification, user=user, user_by=visitor, is_follow_request=True
+    )
+    if not note:
+        return HttpResponse("go hell")
+    else:
+        user_note = note.user
+        user_by_note = note.user_by
+    is_following = False
+    is_follow_req_pending = True
+    # double check
+    if Contact.objects.filter(user_from=visitor, user_to=user).exists():
+        raise Http404()
+
+    choice = request.POST.get("choice")
+    print(choice)
+    if "accept" in choice:
+        user.followers.add(visitor)
+        is_following = True
+        is_follow_req_pending = False
+        note.delete()
+
+    elif choice == "decline":
+        note.delete()
+        is_follow_req_pending = False
+
+    context = {
+        "note": note,
+        "is_follow_request_pending": is_follow_req_pending,
+        "is_following": is_following,
+    }
+
+    if request.is_ajax():
+        html = render_to_string("testy/accept_decline.html", context, request=request)
         return JsonResponse({"form": html})
 
 
@@ -824,11 +931,12 @@ def SearchUser(request):
     context = {
         "users": users,
     }
+    """ 
     if request.is_ajax():
         html = render_to_string("testy/base.html", context, request=request)
         return JsonResponse({"form": html})
-
-    return render(request, "testy/search.html", context)
+    """
+    return render(request, "testy/searched_user.html", context)
 
 
 @login_required
@@ -843,12 +951,15 @@ def Notify(request):
 @login_required
 def StoryCreate(request):
     ImageFormset = modelformset_factory(
-        Story, fields=("photo",), extra=4, can_delete=True
+        Story, fields=("photo",),formset=BaseImageFormset,
     )
     if request.method == "POST":
         formset = ImageFormset(request.POST or None, request.FILES or None)
         if formset.is_valid():
+            
             for f in formset:
+                no_of_formset = 0
+                no_of_error = 0
                 try:
                     img = Story(user=request.user, photo=f.cleaned_data.get("photo"),)
                     if img.photo.path.endswith(
@@ -866,7 +977,13 @@ def StoryCreate(request):
                         img.is_photo = True
                     img.save()
                 except Exception as e:
+                    print("error @ formset")
+                    if not natureimage:
+                        no_of_error += 1
                     break
+                no_of_formset += 1
+            print(no_of_error)
+            print(no_of_formset)
             messages.success(request, "Story has been successfully created.")
             return redirect("index_page")
 
@@ -878,6 +995,12 @@ def StoryCreate(request):
 
 def Explore(request):
     natures = Nature.objects.all()[0:10]
+    context_nature = []
+    for nature in natures:
+        if not nature.user == request.user:
+            if not nature.user.profile.private or nature.hide_post:
+                context_nature.append(nature)
+
     """ 
     explore=[]
     for post in natures:
@@ -886,59 +1009,62 @@ def Explore(request):
     """
 
     context = {
-        "explores": natures,
+        "explores": context_nature,
     }
     return render(request, "testy/explore.html", context)
 
-
-@login_required
-def Suggestion(request):
-    sugges = []
+def SuggestionAlgorithm(request):
     suggested_user = []
-    user_follwings = request.user.following.all()[0 : random.randint(1, 15)]
+    user_follwings = request.user.following.all()
     for user in user_follwings:
         for suspect_user in user.following.all():
-            if suspect_user.followers.count() >= 5:  # or suspect_user.is_verified()
-                suggested_user += suspect_user
-            try:
-                c = Contact.objects.get(user_from=request.user, user_to=suspect_user)
-                if c.was_recent():
+            if not suspect_user.followers.filter(id=request.user.id).exists():
+                try:
+                    c = Contact.objects.get(user_from=request.user, user_to=suspect_user)
+                    if c.was_recent():
+                        suggested_user += suspect_user
+                except:
+                    pass
+                else:
                     suggested_user += suspect_user
-
-            except:
-                print("not found")
-
-    if len(suggested_user) < 100:  # always true so that more suggested_user
+                
+    if len(suggested_user) < 3:  # always true so that more suggested_user
         total_users = User.objects.all().count()
         for i in range(1, 11):
-            random_divisible = random.randint(1, 19)
             random_user_id = random.randint(
-                total_users // random_divisible, total_users
+                1, total_users
             )
-            suggested_user += User.objects.filter(id=random_user_id)
+            try:
+                random_user=User.objects.get(id=random_user_id)
+                if not random_user == request.user and not random_user.followers.filter(id=request.user.id).exists() :
+                    suggested_user += User.objects.filter(id=random_user_id)
+            except:
+                pass
 
     # trending == rate of lines/cmnts growth ==>numpy bla bla
     users = {}
     is_following = False
     for user in suggested_user:
-        sugges += Nature.objects.filter(user=user)
-        if not user == request.user:  # randint may show self.
-            if not user.followers.filter(id=request.user.id).exists():
-                users[user] = is_following
+         users[user] = is_following 
+    
+    print(users)
+    return users
 
-    context = {
-        "users": users,
-        "suggestions": sugges,
+
+@login_required
+def Suggestion(request):
+    users=SuggestionAlgorithm(request)
+    context={
+        "users":users,
     }
-
     return render(request, "testy/suggestion.html", context)
 
 
 @login_required
 def LiveStream(request):
-    return HttpResponse("We are working on this feature!!")
+    msg="We are working on this feature."
+    context={
+        "msg":msg,
+    }
+    return render(request,'testy/live_stream.html',context)
 
-
-@login_required
-def AccountSettings(request):
-    return render(request, "testy/account.html")

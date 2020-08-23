@@ -3,6 +3,7 @@
   <p><span class="badge">{{ nature.comments_set.count }} </span> Comment{{ comments|pluralize }}</p>
 </a>
 
+<div class="main-comment-section">
 {% include 'testy/comment_form.html' %}
 {% for comment in comments %}
 <div class="media">
@@ -23,8 +24,8 @@
 
   {% include "testy/cmnt_reply_form.html" %}
 
-<div style="display:none;" id="toggle-replies{{ comment.id }}">
 
+<div style="display:none;" id="toggle-replies{{ comment.id }}">
   {% for reply in comment.replies.all %}
   <div class="media mt-3">
     <a class="mr-3" href="{% url 'profile_view' reply.user.username %}">
@@ -57,3 +58,5 @@
 </div>
 <hr>
 {% endfor%}
+
+</div>
