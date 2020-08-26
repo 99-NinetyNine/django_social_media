@@ -46,6 +46,7 @@ class NatureImage(models.Model):
     photo = models.FileField(upload_to="images/", blank=True, null=True)
     is_photo = models.BooleanField(default=False, blank=True)
 
+    """
     def save(self, *args, **kwargs):
 
         super().save(*args, **kwargs)
@@ -60,7 +61,7 @@ class NatureImage(models.Model):
             image.thumbnail(output_size)
             image.save(self.photo.path)
             print("image resized from model")
-
+    """
     def __str__(self):
         return f"{self.nature.user.username} images"
 
@@ -150,7 +151,7 @@ class Story(models.Model):
 
     class Meta:
         ordering = ["-pub_date"]
-
+    """ 
     def save(self, *args, **kwargs):
         if not self.photo:
             return
@@ -161,7 +162,8 @@ class Story(models.Model):
             image.save(self.photo.path)
             print("image resized from model")
 
-        super(Nature, self).save(*args, **kwargs)
+        super(Nature, self).save(*args, **kwargs) 
+    """
 
     def __str__(self):
         return f"{self.user.username} story"
