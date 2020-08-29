@@ -232,7 +232,11 @@ class NatureYearArchiveView(LoginRequiredMixin, UserPassesTestMixin, YearArchive
 @login_required
 def IndexView(request):
     print("bug me index view")
+    from .signals import index_view_done
+    index_view_done.send(sender=None, request=request)
+    
     users = request.user.following.all()
+
     if not users:
         idea="Follow People to view thier post."
         users=SuggestionAlgorithm(request)
@@ -303,10 +307,7 @@ def IndexView(request):
         # "stories": story_list(request.user),
     }
 
-    from .signals import index_view_done
-
-    index_view_done.send(sender=None, request=request)
-
+    
     return render(request, "testy/index.html", cont)
 
 
@@ -329,7 +330,7 @@ def NatureCreate(request):
     from .forms import NatureForm
 
     ImageFormset = modelformset_factory(
-        NatureImage, fields=("about", "photo",), formset=BaseImageFormset
+        NatureImage, fields=("about", "photo",),
     )
     if request.method == "POST":
         form = NatureForm(request.POST)
@@ -379,7 +380,7 @@ def NatureCreate(request):
             return redirect("index_page")
 
     else:
-        formset = ImageFormset(queryset=Nature.objects.none())
+        formset = ImageFormset(queryset=NatureImage.objects.none())
     return render(request, "testy/nature_create.html", {"formset": formset,})
 
 
@@ -391,7 +392,7 @@ def NatureEdit(request, id):
     if nature.user != request.user:
         raise Http404()
     if request.method == "POST":
-        form = NatureEditForm(request.POST or None, instance=post)
+        form = NatureEditForm(request.POST or None, instance=nature)
         formset = ImageFormset(request.POST or None, request.FILES or None)
         if form.is_valid() and formset.is_valid():
             form.save()
@@ -413,7 +414,7 @@ def NatureEdit(request, id):
                             nature=nature, photo=f.cleaned_data.get("photo")
                         )
                         d = NatureImage.objects.get(id=data[index].id)
-                        d.image = photo.image
+                        d.image = photo.photo
                         d.save()
             messages.success(request, "Post has been successfully updated!")
             return HttpResponseRedirect(nature.get_absolute_url())
