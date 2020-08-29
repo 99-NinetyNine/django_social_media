@@ -264,25 +264,25 @@ def IndexView(request):
 
     for u in users:
         post_per_user = Nature.objects.filter(user=u)
-        if post_per_user:
-            for ppu in post_per_user:
-                if ppu.pub_date >= ppu.user.profile.last_seen:
-                    post_context.append(ppu)
-            if not post_context:
+        
+        for ppu in post_per_user:
+            if ppu.pub_date >= request.user.profile.last_seen:
+                post_context.append(ppu)
+        if not post_context:
+            days = random.randint(1, 7)
+        c = 0
+        while not post_context:
+            print("i came down")
+            if c == 7:
+                break
+            for ppu_older in post_per_user:
+                if (
+                    ppu_older.pub_date
+                    >= request.user.profile.last_seen - datetime.timedelta(days=days)
+                ):
+                    post_context.append(ppu_older)
                 days = random.randint(1, 7)
-            c = 0
-            while not post_context:
-                print("i came down")
-                if c == 7:
-                    break
-                for ppu_older in post_per_user:
-                    if (
-                        ppu_older.pub_date
-                        >= ppu_older.user.profile.last_seen - datetime.timedelta(days=days)
-                    ):
-                        post_context.append(ppu_older)
-                    days = random.randint(1, 7)
-                c += 1
+            c += 1
     context += post_context
 
     # 1st post as well as other no need to check 1st post in template
