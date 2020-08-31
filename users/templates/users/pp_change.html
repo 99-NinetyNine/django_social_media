@@ -5,7 +5,7 @@
 {% block center_content %}
 <form action="." method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ pp_change.as_p }}
+    {{ pp_change.as_table }}
     
     <button type="submit" class="btn btn-primary">Change</button>
 </form>

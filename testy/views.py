@@ -348,7 +348,8 @@ def NatureCreate(request):
                         about=f.cleaned_data.get("about"),
                         photo=f.cleaned_data.get("photo"),
                     )
-
+                    
+                    """ 
                     if natureimage.photo.path.lower().endswith(
                         (
                             ".png",
@@ -362,10 +363,12 @@ def NatureCreate(request):
                         )
                     ):
                         natureimage.is_photo = True
-
+                    else:
+                        natureimage.is_photo = False 
+                    """
                     natureimage.save()
                 except Exception as e:
-                    print("error @ formset")
+                    print("error @ formset",e)
                     if not natureimage:
                         no_of_error += 1
 

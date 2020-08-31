@@ -19,9 +19,11 @@
 {% else %}
     <div class="carousel-item">
 {% endif %}
-    {% if media.is_photo %}
-      <img class="d-block w-100" style="height:380px;" src="{{ media.photo.url }}" alt="First slide">{% comment %} Image here {% endcomment %}
+  {% comment %}
+    {% if media.is_photo or not media.is_photo %} u nedd lambda func to change file aws 
     {% endif %}
+  {% endcomment %}
+      <img class="d-block w-100" style="height:380px;" src="{{ media.photo.url }}" alt="First slide">{% comment %} Image here {% endcomment %}
 
   {% comment %} modal start {% endcomment %}
 <div class="modal fade" id="modal{{ media.id }}" tabindex="-1" role="dialog" aria-labelledby="modal{{ media.id }}label" aria-hidden="true">

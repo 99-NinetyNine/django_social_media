@@ -87,6 +87,7 @@ def ChangeProfilePhoto(request):
             instance=request.user.profile,
             files=request.FILES,
         )
+        
         if pp_change.is_valid():
             f = pp_change.save(commit=False)
             f.user = request.user
