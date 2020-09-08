@@ -2,12 +2,11 @@
 {% block title %}Password Change{% endblock %}
 
 {% block content %}
-<h2>Password r onfirm</h2>
 
-<form method="post" action="{% url 'password_reset_confirm' %}">
+<form method="post">
 {% csrf_token %}
 {{ form.as_p }}
-<input type="submit" value="Login" class="btn btn-primary btn-block">
+<button  type="submit" class="btn btn-primary btn-block">Reset password</button>
 </form>
 
 {% endblock content %}

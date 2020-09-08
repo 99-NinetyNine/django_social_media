@@ -4,9 +4,9 @@
 {% block center_content %}
 <h2>Password reset</h2>
 
-<form method="post" action="{% url 'password_reset' %}">
+<form method="post">
 {% csrf_token %}
 {{ form.as_p }}
-<input type="submit" value="Login" class="btn btn-primary btn-block">
+<button  type="submit" class="btn btn-primary btn-block">Reset password</button>
 </form>
 {% endblock center_content %}

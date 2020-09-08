@@ -1,10 +1,6 @@
 {% extends "users/account_setting.html" %}
-{% block title %}Password reset complete/{{ request.user.username|capfirst }}{% endblock %}
+{% block title %}Password reset complete{% endblock %}
 
 {% block center_content %}
-<form method="post" action="{% url 'password_reset_complete' %}">
-{% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="Login" class="btn btn-primary btn-block">
-</form>
+<h4>Your password has been reset.</h4>
 {% endblock content %}
