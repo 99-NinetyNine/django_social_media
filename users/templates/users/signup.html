@@ -141,6 +141,16 @@ input[type=submit]:hover {
 </head>
 <body>
 <div class="container">
+{% if messages %}
+<div {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+    {% for message in messages %}
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important:
+    {% endif %}
+
+    {% endfor %}
+</div>
+{% endif %}
+
     <div class="row">
      
       <div class="vl">
