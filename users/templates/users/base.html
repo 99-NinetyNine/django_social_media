@@ -1,18 +1,38 @@
-{% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'testy/base.css' %}">
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <title>{% block title %}{% endblock title %}</title>
-</head>
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Testy{% endblock title %}</title>
+    {% load static %}
+    <link
+      rel="shortcut icon"
+      href="https://salilesh-bucket.s3.us-east-2.amazonaws.com/title_logo.ico"
+    />
+    {% comment %} <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'testy/css/base.css' %}"
+    /> {% endcomment %}
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+      integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
+      crossorigin="anonymous"
+    />
+    <style>
+      {% block otherCSS %}
+      {% comment %} css goes here! {% endcomment %}
+      {% endblock otherCSS %}
+    </style>
 <body>
-{% block base_content %}
+
 {% include 'testy/navbar.html' %}
 
 
@@ -45,25 +65,6 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
 $(document).ready(function (event) {
-      
-      $(document).on('click', '#private-public', function (event) {
-        event.preventDefault();
-        var pk = $(this).attr('value');
-        var privatePublic="privatePublic"+pk
-        $.ajax({
-          type: 'POST',
-          url: '{% url "private_public" %}',
-          data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}', },
-          dataType: 'json',
-          success: function (response) {
-            $('#'+privatePublic).html(response['form'])
-            console.log($('#'+privatePublic).html(response['form']));
-          },
-          error: function (rs, e) {
-            console.log(rs.responseText);
-          },
-        });
-      });
 
     {% block users_otherJs %}
 
@@ -77,7 +78,7 @@ $(document).ready(function (event) {
 
 
   </script>
-  {% endblock base_content %}
+  
 </body>
 
 </html>

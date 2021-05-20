@@ -2,7 +2,19 @@
 {% block content %}
 
 <h3>Actives</h3>
-{% for u ,is_active in users.items %}
-  {% if is_active %}Active<br>{% else %}<br>InActive{% endif %}{{ u.username }}
+{% for u  in users %}
+authenticated users
+
+  
+{% if u.is_authenticated %}
+{{ u.uasername }} i am active 
+{% endif %}
+
+
 {% endfor %}
+me request>>
+{% if request.user.is_authenticated %}
+{{ request.user.uasername }} i am active 
+{% endif %}
+
 {% endblock content %}

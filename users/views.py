@@ -33,7 +33,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text, DjangoUnicodeDecodeError
 from .utils import generate_token
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage,send_mail
 from django.conf import settings
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
@@ -87,7 +87,7 @@ class SignupView(View):
             user.save()
                 
             current_site = get_current_site(request)
-            email_subject = 'Active your Account'
+            subject = 'Active your Account'
             message = render_to_string('users/activate.html',
                                     {
                                         'user': user,
@@ -96,15 +96,19 @@ class SignupView(View):
                                         'token': generate_token.make_token(user)
                                     }
                                     )
+            print(current_site.domain)
+            # email_message = EmailMessage(
+            #     email_subject,
+            #     message,
+            #     settings.EMAIL_HOST_USER,
+            #     [user.email]
+            # )
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [user.email, ]
+            send_mail( subject, message, email_from, recipient_list )
 
-            email_message = EmailMessage(
-                email_subject,
-                message,
-                settings.EMAIL_HOST_USER,
-                [user.email]
-            )
-
-            EmailThread(email_message).start()
+            # EmailThread(email_message).start()
+            #user.email_user(email_subject, message)
             messages.add_message(request, messages.SUCCESS,
                                 'account created succesfully')
 

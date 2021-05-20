@@ -85,18 +85,9 @@ class BaseImageFormset(BaseModelFormSet):
 
 
 def TestView(request):
-    x={}
     users=User.objects.all()
-    for u in users: 
-        is_active=False
-        if u.is_active:
-            is_active=True
-        x[u]=is_active
-        
-        
-
     context = {
-        "users": x,
+        "users": users,
     }
     return render(request, "testy/test.html", context)
 
@@ -542,10 +533,9 @@ def NatureDetail(request, pk):
 
 @login_required
 def ProfileView(request, username):
-    if not username:
-        username = request.user.username
-
-    user = User.objects.get(username=username)
+    user=request.user
+    if User.objects.filter(username=username).exists():
+        user=User.objects.get(username=username)
     visitor = request.user
     is_following = False
     is_private = False
@@ -1021,17 +1011,18 @@ def Explore(request):
 def SuggestionAlgorithm(request):
     suggested_user = []
     user_follwings = request.user.following.all()
-    for user in user_follwings:
-        for suspect_user in user.following.all():
-            if not suspect_user.followers.filter(id=request.user.id).exists():
-                try:
-                    c = Contact.objects.get(user_from=request.user, user_to=suspect_user)
-                    if c.was_recent():
+    if user_follwings:
+        for user in user_follwings:
+            for suspect_user in user.following.all():
+                if not suspect_user.followers.filter(id=request.user.id).exists():
+                    try:
+                        c = Contact.objects.get(user_from=request.user, user_to=suspect_user)
+                        if c.was_recent():
+                            suggested_user += suspect_user
+                    except:
+                        pass
+                    else:
                         suggested_user += suspect_user
-                except:
-                    pass
-                else:
-                    suggested_user += suspect_user
                 
     if len(suggested_user) < 3:  # always true so that more suggested_user
         total_users = User.objects.all().count()

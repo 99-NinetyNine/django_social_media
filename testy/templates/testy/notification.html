@@ -30,7 +30,7 @@ Notifications/{{ request.user.username|capfirst }}
 <div class="alert alert-info note" role="alert">
 <div class="row">
 <div class="col">
-<img src={{ note.user.profile.image.url }} height="10" width="10">
+<img src={{ note.user.profile.image.url }} height="40" width="40">
 
 {{ note }}
 
@@ -56,3 +56,26 @@ Notifications/{{ request.user.username|capfirst }}
 
 
 {% endblock content %}
+
+{% block otherJs %}
+
+$(document).on('submit', '.accept-form', function (event) {
+  event.preventDefault();
+  var element=$(document.activeElement);
+  var pk=element.val();
+  var choice=element.attr('name');
+  var acceptDecline="accept-decline"+pk;
+
+  $.ajax({
+    type: 'POST',
+    url: '{% url 'accept_follower' %}',
+    data: $(this).serialize()+"&choice="+choice,
+    dataType: 'json',
+    success: function (response) {
+        $("#"+acceptDecline).parents(".note").fadeOut(300, function(){ $(this).remove();});
+      },
+
+  });
+});
+
+{% endblock otherJs %}

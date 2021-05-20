@@ -3,7 +3,7 @@
 {% for nature in explores %}
 
 <h6>
-    <a href="{% url 'profile_view' nature.user.username %}">
+    <a href="{% url 'profile_view' userid=nature.user.id %}">
         <img class="rounded-circle" width="30" height="30" src="{{ nature.user.profile.image.url }}" alt="i">
         <strong>@{{ nature.user.username }}</strong>
     </a>

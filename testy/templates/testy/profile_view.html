@@ -12,7 +12,7 @@
 {% endfor %}
 {% endif %}
 <a href="#">
-<img class="rounded-circle" height="80" width="80" src={{ user.profile.image.url }}>
+<img class="rounded-circle" height="40" width="40" src={{ user.profile.image.url }}>
 </a>
 <strong>@{{ user.username }}</strong>
 {% if user == request.user %}
@@ -45,7 +45,7 @@
 
 <h6>
     <a href="{% url 'profile_view' nature.user.username %}">
-        <img class="img-index-profile" width="10" height="10" src="{{ nature.user.profile.image.url }}" alt="i">
+        <img class="img-index-profile" width="40" height="40" src="{{ nature.user.profile.image.url }}" alt="i">
         <strong>@{{ nature.user.username }}</strong>
     </a>
 </h6>
@@ -58,7 +58,7 @@
 {% elif nature.hide_post == False %}
 <h6>
     <a href="{% url 'profile_view' nature.user.username %}">
-        <img class="img-index-profile" width="10" height="10" src="{{ nature.user.profile.image.url }}" alt="i">
+        <img class="img-index-profile" width="40" height="40" src="{{ nature.user.profile.image.url }}" alt="i">
         <strong>@{{ nature.user.username }}</strong>
     </a>
 </h6>
@@ -80,7 +80,7 @@
 
 {% endfor %}
 <br>
-
+<br><br>
 {% if is_private and not user == request.user %}
 <h5>This account is private.<br>Follow <b>@{{ user.username }}</b> to see posts</h5>
 {% endif %}

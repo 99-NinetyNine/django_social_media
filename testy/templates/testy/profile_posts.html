@@ -3,7 +3,7 @@
 {% for nature in natures %}
 <h6>
     <a href="{% url 'profile_view' nature.user.username %}">
-        <img class="img-index-profile" width="10" height="10" src="{{ nature.user.profile.image.url }}" alt="i">
+        <img class="img-index-profile" width="40" height="40" src="{{ nature.user.profile.image.url }}" alt="i">
         <strong>@{{ nature.user.username }}</strong>
     </a>
 </h6>
@@ -63,5 +63,5 @@ Add now</h5>
 {% endif %}
 
 {% endfor %}
-<br>
+<br><br><br>
 {% endblock user_posts %}

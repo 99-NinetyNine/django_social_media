@@ -26,25 +26,9 @@
       integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
       crossorigin="anonymous"
     />
-    {% comment %}
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{% static 'testy/css/slides.css' %}"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{% static 'testy/css/story_view.css' %}"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{% static 'testy/css/index.css' %}"
-    />
-    {% endcomment %}
     <style>
       {% block otherCSS %}
+      {% comment %} css goes here! {% endcomment %}
       {% endblock otherCSS %}
     </style>
   </head>
@@ -63,9 +47,10 @@
           </h6>
           {% block content %} {% endblock content %}
         </div>
+        
         <div class="col-sm-2 float-right">
           {% block right_side %}
-          <h3>adss</h3>
+          
           {% endblock right_side %}
         </div>
       </div>
@@ -92,46 +77,24 @@
               return confirm("Are you sure to delete this post?");
             });
 
-        $(".click-reply").click(function(){
-          var pk = $(this).attr('value');
-          var xyz="toggle-form"+pk;
-          $("#"+xyz).toggle(500, function() {
-          // Animation complete.
-          });
-        });
-
-        $(".toggle-reply").click(function(){
-           var pk=$(this).attr('value');
-           var t="toggle-replies"+pk;
-           console.log(pk);
-           $("#"+t).toggle("fast");
-        });
-
-
-
-
-
-            $(document).on('click', '#like', function (event) {
-              event.preventDefault();
-
-
-              var pk = $(this).attr('value');
-              var likeSection="like-section"+pk;
-              $.ajax({
-                type: 'POST',
-                url: '{% url "like_post" %}',
-                data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
-                dataType: 'json',
-                success: function (response) {
-                  $('#'+likeSection).html(response['form'])
-                  console.log($('#'+likeSection).html(response['form']));
-                },
-                error: function (rs, e) {
-                  console.log(rs.responseText);
-                },
-              });
+          $(document).on('click', '#like', function (event) {
+            event.preventDefault();
+            var pk = $(this).attr('value');
+            var likeSection="like-section"+pk;
+            $.ajax({
+              type: 'POST',
+              url: '{% url "like_post" %}',
+              data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+              dataType: 'json',
+              success: function (response) {
+                $('#'+likeSection).html(response['form'])
+                console.log($('#'+likeSection).html(response['form']));
+              },
+              error: function (rs, e) {
+                console.log(rs.responseText);
+              },
             });
-
+          });
             {% comment %}
 
           $(document).on('click', '#all-likes', function (event) {
@@ -198,42 +161,6 @@
             });
 
 
-            $(document).on('submit', '.comment-form', function (event) {
-              event.preventDefault();
-              $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: $(this).serialize(),
-                dataType: 'json',
-                success: function (response) {
-                  $('.main-comment-section').html(response['form']);
-                  $('#id_comment').val('');
-                  },
-
-              });
-            });
-
-
-            $(document).on('submit', '.reply-form', function (event) {
-              event.preventDefault();
-              console.log($(this).serialize());
-              $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: $(this).serialize(),
-                dataType: 'json',
-                success: function (response) {
-                  $('.main-comment-section').html(response['form']);
-                  $('id_comment').val('');
-
-                },
-
-              });
-            });
-
-
-
-
             $(document).on('click', '#favourite', function (event) {
               event.preventDefault();
               var pk = $(this).attr('value');
@@ -253,86 +180,6 @@
               });
             });
 
-
-            $(document).on('click', '#hide', function (event) {
-              event.preventDefault();
-              var pk = $(this).attr('value');
-              var hideShow="hide-show"+pk
-              $.ajax({
-                type: 'POST',
-                url: '{% url "nature_hide" %}',
-                data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
-                dataType: 'json',
-                success: function (response) {
-                  $('#'+hideShow).html(response['form'])
-                  console.log($('#'+hideShow).html(response['form']));
-                },
-                error: function (rs, e) {
-                  console.log(rs.responseText);
-                },
-              });
-            });
-
-            $(document).on('click', '#restrict-allow', function (event) {
-              event.preventDefault();
-              var pk = $(this).attr('value');
-              var restrictAllow="restrictAllow"+pk
-              $.ajax({
-                type: 'POST',
-                url: '{% url "comment_restrict" %}',
-                data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}','restrict':pk, },
-                dataType: 'json',
-                success: function (response) {
-                  $('#'+restrictAllow).html(response['form'])
-                  console.log($('#'+restrictAllow).html(response['form']));
-                },
-                error: function (rs, e) {
-                  console.log(rs.responseText);
-                },
-              });
-            });
-
-
-            $(document).on('click', '#private-public', function (event) {
-              event.preventDefault();
-              var pk = $(this).attr('value');
-              var privatePublic="privatePublic"+pk
-              $.ajax({
-                type: 'POST',
-                url: '{% url "private_public" %}',
-                data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}', },
-                dataType: 'json',
-                success: function (response) {
-                  $('#'+privatePublic).html(response['form'])
-                  console.log($('#'+privatePublic).html(response['form']));
-                },
-                error: function (rs, e) {
-                  console.log(rs.responseText);
-                },
-              });
-            });
-
-
-
-
-            $(document).on('submit', '.accept-form', function (event) {
-              event.preventDefault();
-              var element=$(document.activeElement);
-              var pk=element.val();
-              var choice=element.attr('name');
-              var acceptDecline="accept-decline"+pk;
-
-              $.ajax({
-                type: 'POST',
-                url: '{% url 'accept_follower' %}',
-                data: $(this).serialize()+"&choice="+choice,
-                dataType: 'json',
-                success: function (response) {
-                    $("#"+acceptDecline).parents(".note").fadeOut(300, function(){ $(this).remove();});
-                  },
-
-              });
-            });
 
 
           {% block otherJs %}

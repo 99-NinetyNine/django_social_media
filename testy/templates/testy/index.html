@@ -16,7 +16,7 @@
 {% for nature,tuple in natures_context.items %}
 <h6>
     <a href="{% url 'profile_view' nature.user.username %}">
-        <img class="rounded-circle" width="30" height="30" src="{{ nature.user.profile.image.url }}" alt="i">
+        <img class="rounded-circle" width="40" height="40" src="{{ nature.user.profile.image.url }}" alt="i">
         <strong>@{{ nature.user.username }}</strong>
     </a>
     {% include 'testy/update_menu.html' %}

@@ -8,3 +8,29 @@
     {% endif %}
 </form>
 </div>
+
+<script type="text/javascript">
+$(document).ready(function (event) {
+
+    $(document).on('click', '#private-public', function (event) {
+      event.preventDefault();
+      var pk = $(this).attr('value');
+      var privatePublic="privatePublic"+pk
+      $.ajax({
+        type: 'POST',
+        url: '{% url "private_public" %}',
+        data: { 'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}', },
+        dataType: 'json',
+        success: function (response) {
+          $('#'+privatePublic).html(response['form'])
+          console.log($('#'+privatePublic).html(response['form']));
+        },
+        error: function (rs, e) {
+          console.log(rs.responseText);
+        },
+      });
+    });
+
+
+});
+</script>
