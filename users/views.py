@@ -23,7 +23,7 @@ from django.views.generic import (
     DetailView,
     DeleteView,
 )
-from django.contrib.auth.views import LogoutView
+from django.contrib.auth.views import LogoutView, PasswordResetView
 from django.views.generic.list import MultipleObjectMixin
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
@@ -75,7 +75,6 @@ class SignupView(View):
 
     def post(self, request):
         context = {
-
             'data': request.POST,
             'has_error': False
         }
@@ -91,28 +90,18 @@ class SignupView(View):
             message = render_to_string('users/activate.html',
                                     {
                                         'user': user,
-                                        'domain': current_site.domain,
+                                        'domain':current_site.domain[:-1],
                                         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                                         'token': generate_token.make_token(user)
                                     }
                                     )
-            print(current_site.domain)
-            # email_message = EmailMessage(
-            #     email_subject,
-            #     message,
-            #     settings.EMAIL_HOST_USER,
-            #     [user.email]
-            # )
             email_from = settings.EMAIL_HOST_USER
             recipient_list = [user.email, ]
             send_mail( subject, message, email_from, recipient_list )
-
-            # EmailThread(email_message).start()
-            #user.email_user(email_subject, message)
             messages.add_message(request, messages.SUCCESS,
                                 'account created succesfully')
 
-            return render(request,'users/activate_account.html')
+        return render(request,'users/activate_account.html')
 
 
 class ActivateAccountView(View):
@@ -129,6 +118,8 @@ class ActivateAccountView(View):
             return redirect('login')
         return render(request, 'users/activate_failed.html', status=401)
 
+class PasswordResetView1(PasswordResetView):
+    from_email = settings.EMAIL_HOST_USER
 
 
 @login_required

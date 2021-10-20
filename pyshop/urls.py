@@ -9,3 +9,8 @@ urlpatterns = [
 ]
 # docker run -p 6379:6379 -d redis:5
 
+
+#rm -f ./.git/index.lock
+#cd .git
+#del index.git
+#del index.lock

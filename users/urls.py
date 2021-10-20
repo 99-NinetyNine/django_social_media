@@ -25,7 +25,7 @@ urlpatterns = [
     ),
     path(
         "password_reset/",
-        auth_views.PasswordResetView.as_view(template_name="users/pwd_reset.html"),
+        auth_views.PasswordResetView.as_view(from_email = settings.EMAIL_HOST_USER,template_name="users/pwd_reset.html"),
         name="password_reset",
     ),
     path("password_reset/done/",auth_views.PasswordResetDoneView.as_view(template_name="users/pwd_reset_done.html"),name="password_reset_done",),
@@ -37,6 +37,7 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+    
     path("account/settings/", views.EditProfile, name="account_setting"),
     path("account/visibility/", views.ProfileVisibility, name="private_public"),
     path("change/photo/", views.ChangeProfilePhoto, name="change_profile"),
