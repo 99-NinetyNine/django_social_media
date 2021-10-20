@@ -9,7 +9,7 @@ from django.views.generic.dates import (
     MonthArchiveView,
     WeekArchiveView,
 )
-
+from django.contrib.auth.decorators import user_passes_test
 
 from .models import (
     Nature,
@@ -222,10 +222,8 @@ class NatureYearArchiveView(LoginRequiredMixin, UserPassesTestMixin, YearArchive
 
 @login_required
 def IndexView(request):
-    print("bug me index view")
     from .signals import index_view_done
     index_view_done.send(sender=None, request=request)
-    
     users = request.user.following.all()
 
     if not users:
@@ -316,17 +314,23 @@ def story_list(req_user):
     return s
 
 
+    
 @login_required
 def NatureCreate(request):
+    first_post = Nature.objects.filter(user=request.user).first()
+    if(first_post):
+        if((timezone.now()-datetime.timedelta(days=1))>=first_post.pub_date):
+            Profile.objects.filter(user=request.user).update(has_one_post_published=False)
     from .forms import NatureForm
-
+    #request.user.profile.has_one_post_published=True
     ImageFormset = modelformset_factory(
         NatureImage, fields=("about", "photo",),
     )
     if request.method == "POST":
         form = NatureForm(request.POST)
         formset = ImageFormset(request.POST or None, request.FILES)
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid() and formset.is_valid() and not request.user.profile.has_one_post_published:
+            Profile.objects.filter(user=request.user).update(has_one_post_published=True)
             nature = form.save(commit=False)
             nature.user = request.user
             nature.save()
@@ -345,6 +349,7 @@ def NatureCreate(request):
                         (
                             ".png",
                             ".jpg",
+
                             ".jpeg",
                             ".bmp",
                             ".tif",
@@ -358,14 +363,14 @@ def NatureCreate(request):
                         natureimage.is_photo = False 
                     """
                     natureimage.save()
+                    
                 except Exception as e:
                     print("error @ formset",e)
                     if not natureimage:
                         no_of_error += 1
 
                 no_of_formset += 1
-            print(no_of_error)
-            print(no_of_formset)
+            
             if no_of_formset == no_of_error:
                 nature.delete()
                 return redirect("nature_page")
@@ -374,6 +379,8 @@ def NatureCreate(request):
             return redirect("index_page")
 
     else:
+        if request.user.profile.has_one_post_published:
+            return render(request,"testy/nature_create_unallowed.html")
         formset = ImageFormset(queryset=NatureImage.objects.none())
     return render(request, "testy/nature_create.html", {"formset": formset,})
 
