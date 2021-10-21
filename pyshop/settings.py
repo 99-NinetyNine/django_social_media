@@ -11,7 +11,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = True #(os.environ.get('DEBUG_VALUE')=="True")
 
-ALLOWED_HOSTS = ['127.0.0.1','neyture.herokuapp.com',]
+ALLOWED_HOSTS = ['127.0.0.1','neyture.herokuapp.com',"www.earthespy.com"]
 
 LOGIN_REDIRECT_URL = "index_page"
 LOGIN_URL = "login"
