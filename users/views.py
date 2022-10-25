@@ -101,7 +101,7 @@ class SignupView(View):
             messages.add_message(request, messages.SUCCESS,
                                 'account created succesfully')
 
-        return render(request,'users/activate_account.html')
+        return render(request,'users/activate_account.html',{"link":message})
 
 
 class ActivateAccountView(View):

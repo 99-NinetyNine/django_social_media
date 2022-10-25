@@ -733,7 +733,7 @@ def TotalLikes(request, pk):
         "modal_heading": heading,
         "users": users,
     }
-    print("ajax is bitch")
+    
     """
     if request.is_ajax():
         html = render_to_string("testy/like_section2.html", context, request=request)

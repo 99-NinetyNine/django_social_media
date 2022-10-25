@@ -6,6 +6,7 @@ urlpatterns = [
     path("", include("testy.urls")),
     path("users/", include("users.urls")),
     path("accounts/", include("allauth.urls")),
+    path("bulls/", include("testy2.urls")),
 ]
 # docker run -p 6379:6379 -d redis:5
 
